@@ -33,7 +33,6 @@ def check_description(desc):
 
 def add_event(room, desc, user_id):
     Events.insert(timestamp=time.time(), location=room, loc_desc=desc, user=user_id).execute()
-    # Events.insert(timestamp=time.time(), location=room, loc_desc=desc).execute()
 
 
 def get_street(name):

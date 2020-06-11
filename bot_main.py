@@ -45,11 +45,11 @@ async def bandit_handler(event):
 @client.on(events.MessageEdited(chats=(944268265,), pattern=r"(?s)^Ты находишься на 🏡(.+?) (\d+)\s+(.+)"))
 @client.on(events.NewMessage(chats=(944268265,), pattern=r"(?s)^Ты находишься на 🏡(.+?) (\d+)\s+(.+)"))
 async def town_handler(event):
+    global bandit
     room = {"street": event.pattern_match.group(1),
             "num": int(event.pattern_match.group(2)),
             "desc": event.pattern_match.group(3),
             "exits": list()}
-    global bandit
     if bandit:
         room["desc"] = "Тебе удалось одолеть городского"
         bandit = False
