@@ -1,5 +1,13 @@
 from peewee import *
+import warnings
+import pymysql
 from config import MYSQL_USER, MYSQL_PASS
+
+warnings.filterwarnings(
+  action="ignore",
+  message=".*Duplicate entry.*",
+  category=pymysql.Warning
+)
 
 database = MySQLDatabase('sphere_map',
                          user=MYSQL_USER, password=MYSQL_PASS,
