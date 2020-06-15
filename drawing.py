@@ -6,20 +6,20 @@ room_coords = tuple([] for _ in range(len(Streets)))
 
 class MapDrawer:
 
-    def __init__(self, width=7800, height=4400):
+    def __init__(self, width=9600, height=6000):
         self.image = Image.new("RGB", (width, height))
         self.draw = ImageDraw.Draw(self.image)
-        self.node_width = 100
-        self.node_height = 60
+        self.node_width = width/39 / 2
+        self.node_height = height/35 / 2
 
-    def draw_node(self, x, y, name, poi):
+    def draw_node(self, x, y, name, num, poi):
         width = self.node_width
         height = self.node_height
         x_span = width
         y_span = height
         left = y * (width+x_span)
         up = x * (height+y_span)
-        fnt = ImageFont.truetype('arial.ttf', size=15)
+        fnt = ImageFont.truetype('arial.ttf', size=14)
         fill = None
         if poi in (1, 2, 5, 6, 8, 9):
             fill = ImageColor.getrgb("grey")
@@ -28,7 +28,9 @@ class MapDrawer:
         elif poi in (3, 10, 11):
             fill = ImageColor.getrgb("green")
         self.draw.rectangle((left, up, left+width, up+height), fill=fill)
-        self.draw.text((left+2, up+2), name, font=fnt, fill=ImageColor.getrgb("blue"))
+        self.draw.multiline_text((left+2, up+2), name.replace(" ", "\n"), font=fnt, fill=ImageColor.getrgb("blue"))
+        num_width = self.draw.textsize(str(num), font=fnt)[0]
+        self.draw.text((left + width - num_width-2, up + 2), str(num), font=fnt, fill=ImageColor.getrgb("blue"))
 
     def draw_edge(self, x1, y1, x2, y2):
         width = self.node_width
@@ -58,27 +60,31 @@ class MapDrawer:
 
 
 def draw_nodes(drawer):
-    for room in Rooms.select().order_by(+Rooms.x, +Rooms.y):
-        y = append_y(room.x, room.y)
-        event_history = (Events.select().where(Events.location == room))
-        poi = None
-        if event_history:
-            poi = 1
-            for event in event_history:
-                if event.loc_desc.type.id != 1:
-                    poi = event.loc_desc.type.id
-                    break
-        name = f"{room.street.name} {room.y}"
-        drawer.draw_node(room.x, y, name, poi)
+    query = (Rooms
+             .select(Rooms, fn.MAX(LocDescription.type).alias('type'), Streets.name)
+             .join(Events, JOIN.LEFT_OUTER)
+             .join(LocDescription, JOIN.LEFT_OUTER)
+             .join(Streets, on=(Rooms.x == Streets.x))
+             .group_by(Rooms.id)
+             .order_by(+Rooms.x, +Rooms.y))
+    for (_, room_x, room_y, room_type, street_name) in database.execute(query):
+        y = append_y(room_x, room_y)
+        drawer.draw_node(room_x, y, street_name, room_y, room_type)
 
 
 def draw_edges(drawer):
-    query = (Passages.select(Passages.start, Passages.end).where(Passages.start > Passages.end)
-             |
-             Passages.select(Passages.end, Passages.start).where(Passages.end > Passages.start))
-    for link in query:
-        drawer.draw_edge(link.start.x, get_y(link.start.x, link.start.y),
-                         link.end.x, get_y(link.end.x, link.end.y))
+    Start = Rooms.alias()
+    End = Rooms.alias()
+    cte = (Passages.select(Passages.start, Passages.end).where(Passages.start > Passages.end)
+           |
+           Passages.select(Passages.end, Passages.start).where(Passages.end > Passages.start))
+
+    query = (cte.select(Start.x, Start.y, End.x, End.y)
+             .join(Start, on=(Start.id == cte.c.start))
+             .join(End, on=(End.id == cte.c.end)))
+    for (start_x, start_y, end_x, end_y) in database.execute(query):
+        drawer.draw_edge(start_x, get_y(start_x, start_y),
+                         end_x, get_y(end_x, end_y))
 
 
 def append_y(x, num):
@@ -94,6 +100,10 @@ def get_y(x, num):
 
 if __name__ == "__main__":
     draw = MapDrawer()
+    print("Generating nodes...")
     draw_nodes(draw)
+    print("Generating edges...")
     draw_edges(draw)
+    print("Generating png...")
     draw.render_png()
+    print("Image map ready")
