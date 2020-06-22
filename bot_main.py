@@ -13,9 +13,10 @@ logging.getLogger("SphereMap").setLevel(logging.DEBUG)
 client = TelegramClient('AnTi3z client', API_ID, API_HASH)
 
 bandit = False
+entry = False
 
 
-async def db_room_parse(room, user):
+async def db_room_parse(room, user, date, entry_flag=False):
     logger.info(f"ROOM: {room}")
     for passage in room["exits"]:
         db_sphere.add_street(passage["x"], passage["street"])
@@ -33,7 +34,7 @@ async def db_room_parse(room, user):
 
     desc = db_sphere.check_description(room["desc"])
     if start_room:
-        db_sphere.add_event(start_room, desc, user)
+        return db_sphere.add_event(start_room, desc, user, date, entry_flag)
 
 
 @client.on(events.NewMessage(chats=(944268265,), pattern=r"(?s)^Тебе удалось одолеть городского"))
@@ -42,17 +43,27 @@ async def bandit_handler(event):
     bandit = True
 
 
+@client.on(events.NewMessage(chats=(944268265,), pattern=r"(?s)^Ты начал гулять по городу"))
+async def entry_handler(event):
+    global entry
+    entry = True
+
+
 @client.on(events.MessageEdited(chats=(944268265,), pattern=r"(?s)^Ты находишься на 🏡(.+?) (\d+)\s+(.+)"))
 @client.on(events.NewMessage(chats=(944268265,), pattern=r"(?s)^Ты находишься на 🏡(.+?) (\d+)\s+(.+)"))
 async def town_handler(event):
     global bandit
+    global entry
+    entry_flag = entry
+    bandit_flag = bandit
+    entry = False
+    bandit = False
     room = {"street": event.pattern_match.group(1),
             "num": int(event.pattern_match.group(2)),
             "desc": event.pattern_match.group(3),
             "exits": list()}
-    if bandit:
+    if bandit_flag:
         room["desc"] = "Тебе удалось одолеть городского"
-        bandit = False
     for row in event.message.buttons:
         for btn in row:
             txt = re.search(r"(?s)🏡 (\d+) (.+)", btn.text)
@@ -64,7 +75,8 @@ async def town_handler(event):
                     "x": int(data.group(1)),
                     "y": int(data.group(2))
                 })
-    await db_room_parse(room, event.message.to_id.user_id)
+    date = event.message.edit_date or event.message.date
+    await db_room_parse(room, event.message.to_id.user_id, date, entry_flag)
 
 
 client.start()

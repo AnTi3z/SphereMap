@@ -1,5 +1,4 @@
 import re
-import time
 import logging
 from db_models import *
 
@@ -31,8 +30,10 @@ def check_description(desc):
     return LocDescription.get(LocDescription.id == row_id)
 
 
-def add_event(room, desc, user_id):
-    Events.insert(timestamp=time.time(), location=room, loc_desc=desc, user=user_id).execute()
+def add_event(room, desc, user_id, date, entry):
+    event_id = Events.insert(timestamp=int(date.timestamp()), location=room, loc_desc=desc, user=user_id).execute()
+    if entry:
+        EntryPoints.insert(event=event_id).execute()
 
 
 def get_street(name):
