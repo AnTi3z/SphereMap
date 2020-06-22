@@ -84,10 +84,19 @@ class Teleports(BaseModel):
 
 
 class EntryPoints(BaseModel):
-    event = ForeignKeyField(column_name='event_id', field='id', model=Events)
+    event = ForeignKeyField(column_name='event_id', field='id', model=Events, unique=True)
 
     class Meta:
         table_name = 'entry_points'
+        primary_key = False
+
+
+class EntryRooms(BaseModel):
+    entry = ForeignKeyField(column_name='entry', field='id', model=Rooms, unique=True)
+
+    class Meta:
+        table_name = 'entry_rooms'
+        primary_key = False
 
 
 class Passages(BaseModel):
