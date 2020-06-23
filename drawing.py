@@ -33,7 +33,7 @@ class MapDrawer:
         up = (x-1) * (height+40) + self.y_span // 2 + span/2 + 3
         self.draw.rectangle((left, up, left + width, up + height), fill=ImageColor.getrgb("LightBlue"))
 
-    def draw_node(self, x, y, name, num, poi, entry=False):
+    def draw_node(self, x, y, name, num, poi, visits, entry=False):
         if entry:
             self._draw_entry(x, y)
         width = self.node_width
@@ -123,46 +123,13 @@ class MapDrawer:
 
 
 def draw_nodes(drawer):
-    entryes = []
-    for entry in EntryRooms.select():
-        entryes.append(entry.entry.id)
-    query = (Rooms
-             .select(Rooms, fn.MAX(LocDescription.type).alias('type'), Streets.name)
-             .join(Events, JOIN.LEFT_OUTER)
-             .join(LocDescription, JOIN.LEFT_OUTER)
-             .join(Streets, on=(Rooms.x == Streets.x))
-             .group_by(Rooms.id)
-             .order_by(+Rooms.x, +Rooms.y))
-    for (room_id, room_x, room_y, room_type, street_name) in database.execute(query):
-        y = append_y(room_x, room_y)
-        entry_flag = room_id in entryes
-        drawer.draw_node(room_x, y, street_name, room_y, room_type, entry_flag)
+    for room in RoomsInfoView.select():
+        drawer.draw_node(room.x, room.seq_y, room.name, room.y, room.type, room.visits, room.entry_flag)
 
 
 def draw_edges(drawer):
-    Start = Rooms.alias()
-    End = Rooms.alias()
-    cte = (Passages.select(Passages.start, Passages.end).where(Passages.start > Passages.end)
-           |
-           Passages.select(Passages.end, Passages.start).where(Passages.end > Passages.start))
-
-    query = (cte.select(Start.x, Start.y, End.x, End.y)
-             .join(Start, on=(Start.id == cte.c.start))
-             .join(End, on=(End.id == cte.c.end)))
-    for (start_x, start_y, end_x, end_y) in database.execute(query):
-        drawer.draw_edge(start_x, get_y(start_x, start_y),
-                         end_x, get_y(end_x, end_y))
-
-
-def append_y(x, num):
-    global room_coords
-    room_coords[x - 1].append(num)
-    return len(room_coords[x - 1])
-
-
-def get_y(x, num):
-    global room_coords
-    return room_coords[x - 1].index(num) + 1
+    for passage in PassagesView.select():
+        drawer.draw_edge(passage.start_x, passage.start_seq_y, passage.end_x, passage.end_seq_y)
 
 
 if __name__ == "__main__":
