@@ -72,7 +72,7 @@ class Events(BaseModel):
     timestamp = TimestampField(utc=True)
 
     class Meta:
-        table_name = 'Events'
+        table_name = 'events'
 
 
 class Teleports(BaseModel):
@@ -104,9 +104,49 @@ class Passages(BaseModel):
     start = ForeignKeyField(backref='start_room', column_name='start', field='id', model=Rooms)
 
     class Meta:
-        table_name = 'Passages'
+        table_name = 'passages'
         indexes = (
             (('start', 'end'), True),
         )
         primary_key = False
 
+
+class RoomsView(BaseModel):
+    id = IntegerField()
+    x = IntegerField()
+    y = IntegerField()
+    seq_y = IntegerField()
+
+    class Meta:
+        table_name = 'rooms_view'
+        primary_key = False
+
+
+class RoomsInfoView(BaseModel):
+    id = IntegerField()
+    x = IntegerField()
+    y = IntegerField()
+    seq_y = IntegerField()
+    type = IntegerField()
+    name = CharField()
+    visits = IntegerField()
+    entry_flag = BooleanField()
+
+    class Meta:
+        table_name = 'rooms_info_view'
+        primary_key = False
+
+
+class PassagesView(BaseModel):
+    start_id = IntegerField()
+    start_x = IntegerField()
+    start_y = IntegerField()
+    start_seq_y = IntegerField()
+    end_id = IntegerField()
+    end_x = IntegerField()
+    end_y = IntegerField()
+    end_seq_y = IntegerField()
+
+    class Meta:
+        table_name = 'passages_view'
+        primary_key = False
