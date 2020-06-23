@@ -45,7 +45,7 @@ class MapDrawer:
         fill = None
         outline = None
         ico = None
-        if poi == 1:
+        if poi == 1 and visits >= 5:
             fill = ImageColor.getrgb("DimGray")
         elif poi == 2:
             fill = ImageColor.getrgb("DimGray")
@@ -77,8 +77,8 @@ class MapDrawer:
             outline = ImageColor.getrgb("blue")
             ico = self.potion_ico
 
-        if poi:
-            self.draw.rectangle((left + 5, up + 5, left + width + 5, up + height + 5), fill=(48, 48, 48))
+        # if poi > 1 or visits >= 10:
+        #     self.draw.rectangle((left + 5, up + 5, left + width + 5, up + height + 5), fill=(48, 48, 48))
         self.draw.rectangle((left, up, left + width, up + height), fill=fill, outline=outline, width=2)
         self.draw_text(left, up, name, num)
         if ico:
