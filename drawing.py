@@ -1,8 +1,6 @@
 from PIL import Image, ImageColor, ImageDraw, ImageFont
 from db_models import *
 
-room_coords = tuple([] for _ in range(len(Streets)))
-
 
 class MapDrawer:
 
@@ -16,21 +14,48 @@ class MapDrawer:
         self.image = Image.new("RGBA", (width, height), color=ImageColor.getrgb("black"))
         self.draw = ImageDraw.Draw(self.image)
         ico_size = self.node_height // 2
-        self.trap_ico = Image.open("icons//trap3.png").resize((ico_size, ico_size))
-        self.bandit_ico = Image.open("icons//bandit.png").resize((ico_size, ico_size))
-        self.trainer_ico = Image.open("icons//trainer2.png").resize((ico_size, ico_size))
-        self.trader_ico = Image.open("icons//trader.png").resize((ico_size, ico_size))
-        self.citizen_ico = Image.open("icons//citizen2.png").resize((ico_size, ico_size))
-        self.teleport_ico = Image.open("icons//teleport5.png").resize((ico_size, ico_size))
-        self.potion_ico = Image.open("icons//potion.png").resize((ico_size, ico_size))
-        self.present_ico = Image.open("icons//present.png").resize((ico_size, ico_size))
+        color_gray = ImageColor.getrgb("DimGray")
+        color_green = ImageColor.getrgb("green")
+        color_red = ImageColor.getrgb("DarkRed")
+        color_blue = ImageColor.getrgb("blue")
+        self.frames = {
+            1: {"fill": color_gray,   # Пусто
+                "outline": None,
+                "ico": None},
+            2: {"fill": color_gray,   # Тренер
+                "outline": ImageColor.getrgb("blue"),
+                "ico": Image.open("icons//trainer2.png").resize((ico_size, ico_size))},
+            3: {"fill": color_green,  # Подарок
+                "outline": None,
+                "ico": Image.open("icons//present.png").resize((ico_size, ico_size))},
+            4: {"fill": color_red,    # Ловушка
+                "outline": None,
+                "ico": Image.open("icons//trap3.png").resize((ico_size, ico_size))},
+            5: {"fill": color_gray,   # Телепорт
+                "outline": color_blue,
+                "ico": Image.open("icons//teleport5.png").resize((ico_size, ico_size))},
+            6: {"fill": color_gray,   # Торговец
+                "outline": color_blue,
+                "ico": Image.open("icons//trader.png").resize((ico_size, ico_size))},
+            7: {"fill": color_red,    # Бандит
+                "outline": None,
+                "ico": Image.open("icons//bandit.png").resize((ico_size, ico_size))},
+            8: {"fill": color_gray,   # Гражданин
+                "outline": color_blue,
+                "ico": Image.open("icons//citizen2.png").resize((ico_size, ico_size))},
+            9: {"fill": color_gray,   # Снадобье
+                "outline": color_blue,
+                "ico": Image.open("icons//potion.png").resize((ico_size, ico_size))},
+            10: {"fill": color_gray,  # Опыт
+                 "outline": color_blue,
+                 "ico": Image.open("icons//exp.png").resize((ico_size, ico_size))}}
 
     def _draw_entry(self, x, y):
         span = 40
         width = self.node_width + self.x_span - span
         height = self.node_height + self.y_span - span
-        left = (y-1) * (width+40) + self.x_span // 2 + span/2 + 3
-        up = (x-1) * (height+40) + self.y_span // 2 + span/2 + 3
+        left = (y - 1) * (width + 40) + self.x_span // 2 + span / 2
+        up = (x - 1) * (height + 40) + self.y_span // 2 + span / 2
         self.draw.rectangle((left, up, left + width, up + height), fill=ImageColor.getrgb("LightBlue"))
 
     def draw_node(self, x, y, name, num, poi, visits, entry=False):
@@ -42,47 +67,14 @@ class MapDrawer:
         y_span = self.y_span
         left = y * (width + x_span) - width
         up = x * (height + y_span) - height
-        fill = None
-        outline = None
-        ico = None
-        if poi == 1 and visits >= 5:
-            fill = ImageColor.getrgb("DimGray")
-        elif poi == 2:
-            fill = ImageColor.getrgb("DimGray")
-            outline = ImageColor.getrgb("blue")
-            ico = self.trainer_ico
-        elif poi == 3:
-            fill = ImageColor.getrgb("green")
-            ico = self.present_ico
-        elif poi == 4:
-            fill = ImageColor.getrgb("DarkRed")
-            ico = self.trap_ico
-        elif poi == 5:
-            fill = ImageColor.getrgb("DimGray")
-            outline = ImageColor.getrgb("blue")
-            ico = self.teleport_ico
-        elif poi == 6:
-            fill = ImageColor.getrgb("DimGray")
-            outline = ImageColor.getrgb("blue")
-            ico = self.trader_ico
-        elif poi == 7:
-            fill = ImageColor.getrgb("DarkRed")
-            ico = self.bandit_ico
-        elif poi == 8:
-            fill = ImageColor.getrgb("DimGray")
-            outline = ImageColor.getrgb("blue")
-            ico = self.citizen_ico
-        elif poi == 9:
-            fill = ImageColor.getrgb("DimGray")
-            outline = ImageColor.getrgb("blue")
-            ico = self.potion_ico
-
+        frame = self.frames[poi]
         # if poi > 1 or visits >= 10:
         #     self.draw.rectangle((left + 5, up + 5, left + width + 5, up + height + 5), fill=(48, 48, 48))
-        self.draw.rectangle((left, up, left + width, up + height), fill=fill, outline=outline, width=2)
+        self.draw.rectangle((left, up, left + width, up + height), fill=frame["fill"], outline=frame["outline"],
+                            width=2)
         self.draw_text(left, up, name, num)
-        if ico:
-            self.image.alpha_composite(ico, (left + width // 2 + 10, up + height // 2 - 10))
+        if frame["ico"]:
+            self.image.alpha_composite(frame["ico"], (left + width // 2 + 10, up + height // 2 - 10))
 
     def draw_text(self, left, up, name, num):
         x_span = 4
