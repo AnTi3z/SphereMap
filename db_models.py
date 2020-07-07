@@ -91,6 +91,14 @@ class EntryPoints(BaseModel):
         primary_key = False
 
 
+class PortalExits(BaseModel):
+    event = ForeignKeyField(column_name='event_id', field='id', model=Events, unique=True)
+
+    class Meta:
+        table_name = 'portal_exits'
+        primary_key = False
+
+
 class EntryRooms(BaseModel):
     entry = ForeignKeyField(column_name='entry', field='id', model=Rooms, unique=True)
 
