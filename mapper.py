@@ -8,7 +8,7 @@ logger = logging.getLogger('SphereMap')
 
 logging.basicConfig(format='[%(asctime)s.%(msecs)d] %(levelname)s:%(name)s:%(funcName)s [lineno %(lineno)d] %(message)s',datefmt='%H:%M:%S',
                     level=logging.WARNING)
-logging.getLogger("SphereMap").setLevel(logging.DEBUG)
+logging.getLogger("SphereMap").setLevel(logging.WARNING)
 
 client = TelegramClient('AnTi3z client', API_ID, API_HASH)
 
@@ -17,7 +17,7 @@ entry = False
 
 
 async def db_room_parse(room, user, date, entry_flag=False):
-    logger.info(f"ROOM: {room}")
+    logger.debug(f"ROOM: {room}")
     for passage in room["exits"]:
         db_sphere.add_street(passage["x"], passage["street"])
         db_sphere.add_room(passage["x"], passage["y"])
