@@ -114,13 +114,14 @@ class MapDrawer:
         self.image.save(name, "PNG")
 
 
-def draw_nodes(drawer):
-    for room in RoomsInfoView.select():
+def draw_nodes(drawer, filter_types=tuple()):
+    for room in RoomsInfoView.select().where(RoomsInfoView.type.not_in(filter_types)):
         drawer.draw_node(room.x, room.seq_y, room.name, room.y, room.type, room.visits, room.entry_flag)
 
 
-def draw_edges(drawer):
-    for passage in PassagesView.select():
+def draw_edges(drawer, filter_types=tuple()):
+    for passage in PassagesView.select()\
+            .where(PassagesView.start_type.not_in(filter_types)).where(PassagesView.end_type.not_in(filter_types)):
         drawer.draw_edge(passage.start_x, passage.start_seq_y, passage.end_x, passage.end_seq_y)
 
 
@@ -133,3 +134,12 @@ if __name__ == "__main__":
     print("Generating png...")
     draw.render_png()
     print("Image map ready")
+
+    draw2 = MapDrawer()
+    print("Generating nodes2...")
+    draw_nodes(draw2, filter_types=(4, 7))
+    print("Generating edges2...")
+    draw_edges(draw2, filter_types=(4, 7))
+    print("Generating png2...")
+    draw2.render_png('map2.png')
+    print("Image map2 ready")
