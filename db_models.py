@@ -75,14 +75,6 @@ class Events(BaseModel):
         table_name = 'events'
 
 
-class Teleports(BaseModel):
-    source = ForeignKeyField(column_name='event_id', field='id', model=Events)
-    target = ForeignKeyField(column_name='to_location', field='id', model=Rooms)
-
-    class Meta:
-        table_name = 'teleports'
-
-
 class EntryPoints(BaseModel):
     event = ForeignKeyField(column_name='event_id', field='id', model=Events, unique=True)
 
@@ -150,10 +142,12 @@ class PassagesView(BaseModel):
     start_x = IntegerField()
     start_y = IntegerField()
     start_seq_y = IntegerField()
+    start_type = IntegerField()
     end_id = IntegerField()
     end_x = IntegerField()
     end_y = IntegerField()
     end_seq_y = IntegerField()
+    end_type = IntegerField()
 
     class Meta:
         table_name = 'passages_view'
