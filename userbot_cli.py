@@ -10,6 +10,6 @@ logging.basicConfig(format='[%(asctime)s.%(msecs)d] %(levelname)s:%(name)s:%(fun
 if __name__ == "__main__":
     client = TelegramClient('AnTi3z', API_ID, API_HASH)
     client.start()
-    mapper.activate(client)
-    # walker.activate(client)
+    # mapper.activate(client)
+    walker.activate(client)
     client.run_until_disconnected()
