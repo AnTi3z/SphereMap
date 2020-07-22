@@ -9,6 +9,12 @@ warnings.filterwarnings(
   category=pymysql.Warning
 )
 
+warnings.filterwarnings(
+  action="ignore",
+  message=".*NO_AUTO_CREATE_USER.*",
+  category=pymysql.Warning
+)
+
 database = MySQLDatabase('sphere_map',
                          user=MYSQL_USER, password=MYSQL_PASS,
                          host='anti3z.ru', port=3306)
