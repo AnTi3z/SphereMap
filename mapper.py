@@ -15,26 +15,27 @@ entry = False
 
 def db_room_parse(room, user, date, entry_flag=False):
     logger.debug(f"ROOM: {room}")
-    for passage in room["exits"]:
-        Streets.get_or_create(x=passage["x"], name=passage["street"])
-        Rooms.get_or_create(x=passage["x"], y=passage["y"])
-
-    street = Streets.get_or_none(Streets.name == room["street"])
-    if street:
-        (current_room, _) = Rooms.get_or_create(x=street, y=room["num"])
+    with database.connection_context():
         for passage in room["exits"]:
-            (end_room, _) = Rooms.get_or_create(x=passage["x"], y=passage["y"])
-            Passages.get_or_create(start=current_room, end=end_room)
-    else:
-        current_room = None
-        logger.warning(f"No '{room['street']}' street found in DB.")
+            Streets.get_or_create(x=passage["x"], name=passage["street"])
+            Rooms.get_or_create(x=passage["x"], y=passage["y"])
 
-    desc = db_sphere.check_description(room["desc"])
-    if current_room:
-        event = Events.create(timestamp=int(date.timestamp()), location=current_room, loc_desc=desc, user=user)
-        if entry_flag:
-            EntryPoints.create(event=event)
-        return event
+        street = Streets.get_or_none(Streets.name == room["street"])
+        if street:
+            (current_room, _) = Rooms.get_or_create(x=street, y=room["num"])
+            for passage in room["exits"]:
+                (end_room, _) = Rooms.get_or_create(x=passage["x"], y=passage["y"])
+                Passages.get_or_create(start=current_room, end=end_room)
+        else:
+            current_room = None
+            logger.warning(f"No '{room['street']}' street found in DB.")
+
+        desc = db_sphere.check_description(room["desc"])
+        if current_room:
+            event = Events.create(timestamp=int(date.timestamp()), location=current_room, loc_desc=desc, user=user)
+            if entry_flag:
+                EntryPoints.create(event=event)
+            return event
 
 
 @events.register(events.NewMessage(chats=(944268265,), pattern=r"(?s)^Тебе удалось одолеть городского"))

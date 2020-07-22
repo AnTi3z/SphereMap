@@ -21,6 +21,7 @@ def load_graph(graph):
                     .where(PassagesView.start_type.not_in(filtered_types))
                     .where(PassagesView.end_type.not_in(filtered_types))):
         graph.add_edge((passage.start_x, passage.start_y), (passage.end_x, passage.end_y))
+    database.close()
 
 
 def generate_dst():
@@ -66,6 +67,7 @@ async def town_handler(event):
 
     # Координаты текущей комнаты
     x = Streets.get_or_none(Streets.name == event.pattern_match.group(1)).x
+    database.close()
     y = int(event.pattern_match.group(2))
     cur_room = (x, y)
 
