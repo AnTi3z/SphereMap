@@ -1,18 +1,13 @@
-from telethon import TelegramClient, events
+from telethon import events
 import re
 import logging
 import db_sphere
 from db_models import *
-import mapper_bot
-from config import API_ID, API_HASH
 
-logger = logging.getLogger('SphereMap')
 
-logging.basicConfig(format='[%(asctime)s.%(msecs)d] %(levelname)s:%(name)s:%(funcName)s [lineno %(lineno)d] %(message)s',datefmt='%H:%M:%S',
-                    level=logging.WARNING)
-logging.getLogger("SphereMap").setLevel(logging.WARNING)
+logger = logging.getLogger('SphereMap_mapper')
+logger.setLevel(logging.WARNING)
 
-client = TelegramClient('AnTi3z', API_ID, API_HASH)
 
 bandit = False
 entry = False
@@ -42,21 +37,21 @@ def db_room_parse(room, user, date, entry_flag=False):
         return event
 
 
-@client.on(events.NewMessage(chats=(944268265,), pattern=r"(?s)^Тебе удалось одолеть городского"))
+@events.register(events.NewMessage(chats=(944268265,), pattern=r"(?s)^Тебе удалось одолеть городского"))
 async def bandit_handler(event):
     global bandit
     # TODO: Проверить, что это не гражданин
     bandit = True
 
 
-@client.on(events.NewMessage(chats=(944268265,), pattern=r"(?s)^Ты начал гулять по городу"))
+@events.register(events.NewMessage(chats=(944268265,), pattern=r"(?s)^Ты начал гулять по городу"))
 async def entry_handler(event):
     global entry
     entry = True
 
 
-@client.on(events.MessageEdited(chats=(944268265,), pattern=r"(?s)^Ты находишься на 🏡(.+?) (\d+)\s+(.+)"))
-@client.on(events.NewMessage(chats=(944268265,), pattern=r"(?s)^Ты находишься на 🏡(.+?) (\d+)\s+(.+)"))
+@events.register(events.MessageEdited(chats=(944268265,), pattern=r"(?s)^Ты находишься на 🏡(.+?) (\d+)\s+(.+)"))
+@events.register(events.NewMessage(chats=(944268265,), pattern=r"(?s)^Ты находишься на 🏡(.+?) (\d+)\s+(.+)"))
 async def town_handler(event):
     global bandit
     global entry
@@ -83,11 +78,16 @@ async def town_handler(event):
                 })
     date = event.message.edit_date or event.message.date
     db_room_parse(room, event.message.to_id.user_id, date, entry_flag)
-    await client.inline_query('SpheriumMapperBot', "new_event")
+    await event.client.inline_query('SpheriumMapperBot', "new_map_event")
 
 
-if __name__ == "__main__":
-    client.start()
-    mapper_bot.bot.start(bot_token=mapper_bot.BOT_TOKEN)
-    # client.add_event_handler(town_handler)
-    client.run_until_disconnected()
+def activate(client):
+    client.add_event_handler(bandit_handler)
+    client.add_event_handler(entry_handler)
+    client.add_event_handler(town_handler)
+
+
+def deactivate(client):
+    client.remove_event_handler(bandit_handler)
+    client.remove_event_handler(entry_handler)
+    client.remove_event_handler(town_handler)
