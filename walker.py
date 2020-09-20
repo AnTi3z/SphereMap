@@ -12,6 +12,7 @@ nx_map = nx.Graph()
 cur_room = None
 dst_room = None
 AUTO_WALK = True
+DO_TRAINING = True  # очко Тренера
 
 
 def load_graph(graph):
@@ -59,7 +60,12 @@ async def town_handler(event):
             btn_data.append(btn.data.decode('utf-8'))
 
     # Если нарвались на торговца, телепорт и т.п. жмем "Уйти"
-    if 'cwa_nothing' in btn_data:
+    if 'cwa_training' in btn_data and DO_TRAINING:
+        # Если включена тренировка, и мы у тренера - жмём её
+        time.sleep(random.uniform(1.1, 2.5))
+        await event.client(functions.messages.GetBotCallbackAnswerRequest(event.from_id, event.id,
+                                                                          data='cwa_training'.encode("utf-8")))
+    elif 'cwa_nothing' in btn_data:
         time.sleep(random.uniform(1.1, 2.5))
         await event.client(functions.messages.GetBotCallbackAnswerRequest(event.from_id, event.id,
                                                                           data='cwa_nothing'.encode("utf-8")))
