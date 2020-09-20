@@ -13,6 +13,7 @@ cur_room = None
 dst_room = None
 AUTO_WALK = True
 DO_TRAINING = True  # очко Тренера
+AUTO_RETURN = True  # Возвращалка в город при фулл хп
 
 
 def load_graph(graph):
@@ -45,6 +46,16 @@ def generate_dst():
             continue
 
     return True
+
+
+# Возвращалка в город
+@events.register(events.NewMessage(chats=(944268265,), pattern=r"Твоё ❤️ здоровье и 🛡 щит полностью восстановились!"))
+async def auto_return(event):
+    if AUTO_RETURN:
+        time.sleep(random.uniform(1.1, 2.5))
+        await event.client.send_message(944268265, "🔮 Сфериум")
+        time.sleep(random.uniform(1.1, 2.5))
+        await event.client.send_message(944268265, "🏡 Прогулка по городу")
 
 
 @events.register(events.MessageEdited(chats=(944268265,), pattern=r"(?s)^Ты находишься на 🏡(.+?) (\d+)\s+(.+)"))
@@ -109,3 +120,4 @@ async def town_handler(event):
 def activate(client):
     load_graph(nx_map)
     client.add_event_handler(town_handler)
+    client.add_event_handler(auto_return)
