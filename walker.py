@@ -6,6 +6,7 @@ import networkx as nx
 from telethon import events, functions
 
 from db_models import *
+import config
 
 logger = logging.getLogger('SphereMap_walker')
 logger.setLevel(logging.DEBUG)
@@ -13,9 +14,8 @@ logger.setLevel(logging.DEBUG)
 nx_map = nx.Graph()
 cur_room = None
 dst_room = None
-AUTO_WALK = True
-DO_TRAINING = True  # очко Тренера
-AUTO_RETURN = True  # Возвращалка в город при фулл хп
+
+WALKER_CFG = config.load_config('walker')
 
 
 def load_graph(graph, w1=1.0, w2=1.0):
@@ -57,7 +57,7 @@ def generate_dst():
 # Возвращалка в город
 @events.register(events.NewMessage(chats=(944268265,), pattern=r"Твоё ❤️ здоровье и 🛡 щит полностью восстановились!"))
 async def auto_return(event):
-    if AUTO_RETURN:
+    if WALKER_CFG['auto_return']:
         time.sleep(random.uniform(1.1, 2.5))
         await event.client.send_message(944268265, "🔮 Сфериум")
         time.sleep(random.uniform(1.1, 2.5))
@@ -77,7 +77,7 @@ async def town_handler(event):
             btn_data.append(btn.data.decode('utf-8'))
 
     # Если нарвались на торговца, телепорт и т.п. жмем "Уйти"
-    if 'cwa_training' in btn_data and DO_TRAINING:
+    if 'cwa_training' in btn_data and WALKER_CFG['training']:
         # Если включена тренировка, и мы у тренера - жмём её
         time.sleep(random.uniform(1.1, 2.5))
         await event.client(functions.messages.GetBotCallbackAnswerRequest(event.from_id, event.id,
@@ -95,7 +95,7 @@ async def town_handler(event):
     cur_room = (x, y)
 
     # Если включено авто-гуляние
-    if AUTO_WALK:
+    if WALKER_CFG['auto_walk']:
         # Если конечная точка не определена или мы уже в конечной точке
         if (dst_room is None) or (cur_room == dst_room):
             # Генерируем новую конечную точку

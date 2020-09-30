@@ -1,0 +1,9 @@
+{
+    "api": {"id": 56324, "hash": "8dc42a63d4c7366bf404172120d5a1bb"},
+    "mysql": {"user": "suka", "pass": "Pidor!!111"},
+    "walker": {
+        "auto_walk": true,
+        "training": false,
+        "auto_return": true
+    }
+}

@@ -4,14 +4,15 @@ from telethon import TelegramClient
 
 # import mapper
 import walker
-from config import API_ID, API_HASH
+import config
 
 logging.basicConfig(
     format='[%(asctime)s.%(msecs)d] %(levelname)s:%(name)s:%(funcName)s [lineno %(lineno)d] %(message)s',
     datefmt='%H:%M:%S', level=logging.WARNING)
 
 if __name__ == "__main__":
-    client = TelegramClient('AnTi3z', API_ID, API_HASH)
+    api = config.load_config('api')
+    client = TelegramClient('AnTi3z', api['id'], api['hash'])
     client.start()
     # mapper.activate(client)
     walker.activate(client)

@@ -3,7 +3,7 @@ import warnings
 import pymysql
 from peewee import *
 
-from config import MYSQL_USER, MYSQL_PASS
+import config
 
 warnings.filterwarnings(
     action="ignore",
@@ -17,9 +17,10 @@ warnings.filterwarnings(
     category=pymysql.Warning
 )
 
-database = MySQLDatabase('sphere_map',
-                         user=MYSQL_USER, password=MYSQL_PASS,
-                         host='anti3z.ru', port=3306)
+with config.reader('mysql') as cfg:
+    database = MySQLDatabase('sphere_map',
+                             user=cfg['user'], password=cfg['pass'],
+                             host='anti3z.ru', port=3306)
 
 
 class UnknownField(object):
