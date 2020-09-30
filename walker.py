@@ -1,9 +1,11 @@
-from telethon import events, functions
-from db_models import *
-import networkx as nx
 import logging
-import time
 import random
+import time
+
+import networkx as nx
+from telethon import events, functions
+
+from db_models import *
 
 logger = logging.getLogger('SphereMap_walker')
 logger.setLevel(logging.DEBUG)

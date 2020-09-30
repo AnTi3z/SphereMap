@@ -1,18 +1,20 @@
-from peewee import *
 import warnings
+
 import pymysql
+from peewee import *
+
 from config import MYSQL_USER, MYSQL_PASS
 
 warnings.filterwarnings(
-  action="ignore",
-  message=".*Duplicate entry.*",
-  category=pymysql.Warning
+    action="ignore",
+    message=".*Duplicate entry.*",
+    category=pymysql.Warning
 )
 
 warnings.filterwarnings(
-  action="ignore",
-  message=".*NO_AUTO_CREATE_USER.*",
-  category=pymysql.Warning
+    action="ignore",
+    message=".*NO_AUTO_CREATE_USER.*",
+    category=pymysql.Warning
 )
 
 database = MySQLDatabase('sphere_map',
@@ -155,6 +157,7 @@ class PassagesView(BaseModel):
     end_seq_y = IntegerField()
     end_type = IntegerField()
 
-    class Meta:
-        table_name = 'passages_view'
-        primary_key = False
+
+class Meta:
+    table_name = 'passages_view'
+    primary_key = False

@@ -1,4 +1,5 @@
 from PIL import Image, ImageColor, ImageDraw, ImageFont
+
 from db_models import *
 
 
@@ -120,8 +121,8 @@ def draw_nodes(drawer, filter_types=tuple()):
 
 
 def draw_edges(drawer, filter_types=tuple()):
-    for passage in PassagesView.select()\
-            .where(PassagesView.start_type.not_in(filter_types)).where(PassagesView.end_type.not_in(filter_types)):
+    for passage in PassagesView.select().where(
+            PassagesView.start_type.not_in(filter_types)).where(PassagesView.end_type.not_in(filter_types)):
         drawer.draw_edge(passage.start_x, passage.start_seq_y, passage.end_x, passage.end_seq_y)
 
 

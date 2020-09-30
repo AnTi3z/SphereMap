@@ -1,5 +1,6 @@
-import re
 import logging
+import re
+
 from db_models import *
 
 logger = logging.getLogger('SphereMap')

@@ -1,13 +1,13 @@
-from telethon import events
-import re
 import logging
+import re
+
+from telethon import events
+
 import db_sphere
 from db_models import *
 
-
 logger = logging.getLogger('SphereMap_mapper')
 logger.setLevel(logging.WARNING)
-
 
 bandit = False
 entry = False
