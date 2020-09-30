@@ -14,6 +14,8 @@ nx_map = nx.Graph()
 cur_room = None
 dst_room = None
 AUTO_WALK = True
+DO_TRAINING = True  # очко Тренера
+AUTO_RETURN = True  # Возвращалка в город при фулл хп
 
 
 def load_graph(graph):
@@ -48,6 +50,16 @@ def generate_dst():
     return True
 
 
+# Возвращалка в город
+@events.register(events.NewMessage(chats=(944268265,), pattern=r"Твоё ❤️ здоровье и 🛡 щит полностью восстановились!"))
+async def auto_return(event):
+    if AUTO_RETURN:
+        time.sleep(random.uniform(1.1, 2.5))
+        await event.client.send_message(944268265, "🔮 Сфериум")
+        time.sleep(random.uniform(1.1, 2.5))
+        await event.client.send_message(944268265, "🏡 Прогулка по городу")
+
+
 @events.register(events.MessageEdited(chats=(944268265,), pattern=r"(?s)^Ты находишься на 🏡(.+?) (\d+)\s+(.+)"))
 @events.register(events.NewMessage(chats=(944268265,), pattern=r"(?s)^Ты находишься на 🏡(.+?) (\d+)\s+(.+)"))
 async def town_handler(event):
@@ -61,7 +73,12 @@ async def town_handler(event):
             btn_data.append(btn.data.decode('utf-8'))
 
     # Если нарвались на торговца, телепорт и т.п. жмем "Уйти"
-    if 'cwa_nothing' in btn_data:
+    if 'cwa_training' in btn_data and DO_TRAINING:
+        # Если включена тренировка, и мы у тренера - жмём её
+        time.sleep(random.uniform(1.1, 2.5))
+        await event.client(functions.messages.GetBotCallbackAnswerRequest(event.from_id, event.id,
+                                                                          data='cwa_training'.encode("utf-8")))
+    elif 'cwa_nothing' in btn_data:
         time.sleep(random.uniform(1.1, 2.5))
         await event.client(functions.messages.GetBotCallbackAnswerRequest(event.from_id, event.id,
                                                                           data='cwa_nothing'.encode("utf-8")))
@@ -105,3 +122,4 @@ async def town_handler(event):
 def activate(client):
     load_graph(nx_map)
     client.add_event_handler(town_handler)
+    client.add_event_handler(auto_return)
