@@ -157,7 +157,6 @@ class PassagesView(BaseModel):
     end_seq_y = IntegerField()
     end_type = IntegerField()
 
-
-class Meta:
-    table_name = 'passages_view'
-    primary_key = False
+    class Meta:
+        table_name = 'passages_view'
+        primary_key = False
