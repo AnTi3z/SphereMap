@@ -18,13 +18,23 @@ DO_TRAINING = True  # очко Тренера
 AUTO_RETURN = True  # Возвращалка в город при фулл хп
 
 
-def load_graph(graph):
+def load_graph(graph, w1=1.0, w2=1.0):
     filtered_types = (4, 7)
     for passage in (PassagesView
-                    .select(PassagesView.start_x, PassagesView.start_y, PassagesView.end_x, PassagesView.end_y)
+                    .select(PassagesView.start_x, PassagesView.start_y, PassagesView.start_type,
+                            PassagesView.end_x, PassagesView.end_y, PassagesView.end_type)
                     .where(PassagesView.start_type.not_in(filtered_types))
                     .where(PassagesView.end_type.not_in(filtered_types))):
-        graph.add_edge((passage.start_x, passage.start_y), (passage.end_x, passage.end_y))
+
+        start_room = (passage.start_x, passage.start_y)
+        end_room = (passage.end_x, passage.end_y)
+
+        if passage.start_type != 3 and passage.end_type != 3:
+            graph.add_edge(start_room, end_room, weight=1)
+        elif passage.start_type == 3 and passage.end_type == 3:
+            graph.add_edge(start_room, end_room, weight=w2)
+        else:
+            graph.add_edge(start_room, end_room, weight=w1)
     database.close()
 
 
@@ -39,15 +49,9 @@ def generate_dst():
     while True:
         # Генерируем произвольные координаты
         dst_room = random.choice(list(nx_map.nodes))
-        try:
-            # Проверяем построение маршрута
-            nx.shortest_path(nx_map, cur_room, dst_room)
-            break
-        except nx.NetworkXNoPath:
-            # Маршрут не найден, пробуем еще
-            continue
-
-    return True
+        # Проверяем построение маршрута
+        if nx.has_path(nx_map, cur_room, dst_room):
+            return True
 
 
 # Возвращалка в город
@@ -102,7 +106,7 @@ async def town_handler(event):
     if dst_room and (cur_room != dst_room):
         try:
             # Строим маршрут до цели и берем следующую точку в маршруте
-            next_room = nx.shortest_path(nx_map, cur_room, dst_room)[1]
+            next_room = nx.shortest_path(nx_map, cur_room, dst_room, weight='weight')[1]
         except nx.NetworkXNoPath:
             # До цели нет маршрута
             logger.warning(f"NO PATH to dst point!")
@@ -120,6 +124,6 @@ async def town_handler(event):
 
 
 def activate(client):
-    load_graph(nx_map)
+    load_graph(nx_map, 0.1, 0.01)
     client.add_event_handler(town_handler)
     client.add_event_handler(auto_return)
