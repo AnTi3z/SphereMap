@@ -1,0 +1,17 @@
+{
+  "mysql": {
+    "user": "suka",
+    "pass": "Pidor!!111"
+  },
+  "modules": {
+    "walker": {
+      "enabled": false,
+      "auto_walk": true,
+      "training": false,
+      "auto_return": true
+    },
+    "mapper": {
+      "enabled": false
+    }
+  }
+}

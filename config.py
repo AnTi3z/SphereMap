@@ -1,6 +1,8 @@
 import json
 from contextlib import contextmanager
 
+configs = {}
+
 
 def load_config(key=None, file='config.json'):
     with open(file, 'r', encoding='utf-8') as read_file:

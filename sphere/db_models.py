@@ -17,10 +17,9 @@ warnings.filterwarnings(
     category=pymysql.Warning
 )
 
-with config.reader('mysql') as cfg:
-    database = MySQLDatabase('sphere_map',
-                             user=cfg['user'], password=cfg['pass'],
-                             host='anti3z.ru', port=3306)
+database = MySQLDatabase('sphere_map',
+                         user=config.configs['sphere']['mysql']['user'], password=config.configs['sphere']['mysql']['pass'],
+                         host='anti3z.ru', port=3306)
 
 
 class UnknownField(object):

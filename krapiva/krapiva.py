@@ -19,5 +19,13 @@ def activate(client):
     client.add_event_handler(krapiva)
 
 
+def deactivate(client):
+    client.remove_event_handler(krapiva)
+
+
 def load(client):
     activate(client)
+
+
+def unload(client):
+    deactivate(client)

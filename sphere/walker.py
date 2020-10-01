@@ -15,7 +15,7 @@ nx_map = nx.Graph()
 cur_room = None
 dst_room = None
 
-WALKER_CFG = config.load_config('walker')
+WALKER_CFG = config.configs['sphere']['modules']['walker']
 
 
 def load_graph(graph, w1=1.0, w2=1.0):
