@@ -5,7 +5,7 @@ import time
 import networkx as nx
 from telethon import events, functions
 
-from db_models import *
+from .db_models import *
 import config
 
 logger = logging.getLogger('SphereMap_walker')

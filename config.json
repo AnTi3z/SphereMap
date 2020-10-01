@@ -5,5 +5,6 @@
         "auto_walk": true,
         "training": false,
         "auto_return": true
-    }
+    },
+    "modules": ["krapiva", "sphere"]
 }

@@ -3,8 +3,8 @@ import re
 
 from telethon import events
 
-import db_sphere
-from db_models import *
+import sphere.db_sphere as db_sphere
+from .db_models import *
 
 logger = logging.getLogger('SphereMap_mapper')
 logger.setLevel(logging.WARNING)
