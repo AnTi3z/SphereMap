@@ -12,10 +12,23 @@ logging.basicConfig(
 logger = logging.getLogger('UserbotCli')
 logger.setLevel(logging.DEBUG)
 
+modules = None
+
+
+def load_module(name):
+    try:
+        config.configs[name] = config.load_config(file=f"{name}/config.json")
+    except FileNotFoundError as e:
+        logger.error(e)
+    modules.load_module(name, name)
+    module = modules.loaded_modules.get(name)
+    if module:
+        module.load(modules.client)
+
 
 @events.register(events.NewMessage(pattern=r"!load (.+)", outgoing=True))
 async def load(event):
-    modules.load_module(event.pattern_match.group(1))
+    load_module(event.pattern_match.group(1))
 
 
 if __name__ == "__main__":
@@ -25,9 +38,7 @@ if __name__ == "__main__":
 
     modules = Module(client, config.load_config())
     for module_name in modules.list_modules():
-        config.configs[module_name] = config.load_config(file=f"{module_name}/config.json")
-        modules.load_module(module_name, module_name)
-        modules.loaded_modules[module_name].load(modules.client)
+        load_module(module_name)
 
     client.add_event_handler(load)
     client.run_until_disconnected()
