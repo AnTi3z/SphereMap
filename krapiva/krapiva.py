@@ -1,8 +1,12 @@
 from telethon import events
 import time
 import random
+import logging
 
 btn_text = '🏌🏻'
+
+logger = logging.getLogger('Krapiva')
+logger.setLevel(logging.INFO)
 
 
 # КРАПИВАААААААААААААА
@@ -16,10 +20,12 @@ async def krapiva(event):
 
 
 def activate(client):
+    logger.info("Krapiva script activated")
     client.add_event_handler(krapiva)
 
 
 def deactivate(client):
+    logger.info("Krapiva script deactivated")
     client.remove_event_handler(krapiva)
 
 

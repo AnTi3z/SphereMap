@@ -3,7 +3,7 @@ import re
 
 from .db_models import *
 
-logger = logging.getLogger('SphereMap')
+logger = logging.getLogger('Sphere')
 
 
 def check_description(desc):

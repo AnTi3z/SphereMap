@@ -8,8 +8,8 @@ from telethon import events, functions
 from .db_models import *
 import config
 
-logger = logging.getLogger('SphereMap_walker')
-logger.setLevel(logging.DEBUG)
+logger = logging.getLogger('Sphere.walker')
+logger.setLevel(logging.INFO)
 
 nx_map = nx.Graph()
 cur_room = None
@@ -100,7 +100,7 @@ async def town_handler(event):
         if (dst_room is None) or (cur_room == dst_room):
             # Генерируем новую конечную точку
             if generate_dst():
-                logger.info(f"New dst point generated!")
+                logger.debug(f"New dst point generated!")
 
     # Если не достигли цели или у нас новая цель
     if dst_room and (cur_room != dst_room):
@@ -124,6 +124,7 @@ async def town_handler(event):
 
 
 def activate(client):
+    logger.info("Walker script activated")
     load_graph(nx_map, 0.1, 0.01)
     client.add_event_handler(town_handler)
     client.add_event_handler(auto_return)
