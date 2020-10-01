@@ -2,11 +2,12 @@ import json
 from contextlib import contextmanager
 
 
-def load_config(key):
+def load_config(key=None):
     with open('config.json', 'r', encoding='utf-8') as read_file:
-        return json.load(read_file).get(key)
+        cfg = json.load(read_file)
+        return cfg.get(key) if key else cfg
 
 
 @contextmanager
-def reader(key):
+def reader(key=None):
     yield load_config(key)
