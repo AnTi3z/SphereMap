@@ -1,6 +1,7 @@
 from modules import Modules
 
 
+# Load submodules and activate them
 def load(client, cfg):
     submodules = Modules(client, cfg)
     for module_name in submodules.list_modules():

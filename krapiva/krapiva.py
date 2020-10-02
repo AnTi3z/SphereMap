@@ -29,6 +29,7 @@ def deactivate(client):
     client.remove_event_handler(krapiva)
 
 
+# There is no submodules, activate this script
 def load(client, _):
     activate(client)
 
