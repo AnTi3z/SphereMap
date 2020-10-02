@@ -26,5 +26,7 @@ class Modules:
                 importlib.reload(module)
 
             logger.info(f"Module {directory}.{name} loaded")
+            return module
         except Exception as e:
             logger.error(f"Module {directory}.{name} loading error: {e}")
+            return None

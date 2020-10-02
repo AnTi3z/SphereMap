@@ -16,14 +16,13 @@ modules = None
 
 
 def load_module(name):
-    try:
-        module_cfg = config.load_config(file=f"{name}/config.json")
-    except FileNotFoundError as e:
-        module_cfg = None
-        logger.error(e)
-    modules.load_module(name, name)
-    module = modules.loaded_modules.get(name)
+    module = modules.load_module(name, name)
     if module and modules.config['modules'][name]['enabled']:
+        try:
+            module_cfg = config.load_config(file=f"{name}/config.json")
+        except FileNotFoundError as e:
+            module_cfg = None
+            logger.error(e)
         module.activate(modules.client, module_cfg)
 
 
