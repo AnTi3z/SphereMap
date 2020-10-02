@@ -24,7 +24,7 @@ def load_module(name):
     modules.load_module(name, name)
     module = modules.loaded_modules.get(name)
     if module and modules.config['modules'][name]['enabled']:
-        module.load(modules.client, cfg)
+        module.activate(modules.client, module_cfg)
 
 
 @events.register(events.NewMessage(pattern=r"!load (.+)", outgoing=True))

@@ -6,7 +6,7 @@ import networkx as nx
 from telethon import events, functions
 
 from .db_models import *
-import config
+
 
 logger = logging.getLogger('Sphere.walker')
 logger.setLevel(logging.INFO)
@@ -15,7 +15,7 @@ nx_map = nx.Graph()
 cur_room = None
 dst_room = None
 
-WALKER_CFG = config.configs['sphere']['modules']['walker']
+WALKER_CFG = None
 
 
 def load_graph(graph, w1=1.0, w2=1.0):
@@ -123,8 +123,16 @@ async def town_handler(event):
                                                                               data=next_btn_data.encode('utf-8')))
 
 
-def activate(client):
-    logger.info("Walker script activated")
+def activate(client, walker_cfg):
+    global WALKER_CFG
+    WALKER_CFG = walker_cfg
     load_graph(nx_map, 0.1, 0.01)
     client.add_event_handler(town_handler)
     client.add_event_handler(auto_return)
+    logger.info("Walker script activated")
+
+
+def deactivate(client):
+    client.remove_event_handler(town_handler)
+    client.remove_event_handler(auto_return)
+    logger.info("Walker script deactivated")

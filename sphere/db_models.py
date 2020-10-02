@@ -17,8 +17,10 @@ warnings.filterwarnings(
     category=pymysql.Warning
 )
 
+# TODO: Get credentials from loaded modules config
+_cfg = config.load_config("mysql", "sphere/config.json")
 database = MySQLDatabase('sphere_map',
-                         user=config.configs['sphere']['mysql']['user'], password=config.configs['sphere']['mysql']['pass'],
+                         user=_cfg['user'], password=_cfg['pass'],
                          host='anti3z.ru', port=3306)
 
 

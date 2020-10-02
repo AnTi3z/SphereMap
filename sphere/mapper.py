@@ -82,15 +82,15 @@ async def town_handler(event):
     await event.client.inline_query('SpheriumMapperBot', "new_map_event")
 
 
-def activate(client):
-    logger.info("Walker script activated")
+def activate(client, _):
     client.add_event_handler(bandit_handler)
     client.add_event_handler(entry_handler)
     client.add_event_handler(town_handler)
+    logger.info("Walker script activated")
 
 
 def deactivate(client):
-    logger.info("Walker script deactivated")
     client.remove_event_handler(bandit_handler)
     client.remove_event_handler(entry_handler)
     client.remove_event_handler(town_handler)
+    logger.info("Walker script deactivated")
