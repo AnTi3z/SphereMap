@@ -23,7 +23,7 @@ def load_module(name):
         logger.error(e)
     modules.load_module(name, name)
     module = modules.loaded_modules.get(name)
-    if module:
+    if module and modules.config['modules'][name]['enabled']:
         module.load(modules.client, cfg)
 
 

@@ -4,7 +4,7 @@
     "hash": "8dc42a63d4c7366bf404172120d5a1bb"
   },
   "modules": {
-    "krapiva": {},
-    "sphere": {}
+    "krapiva": { "enabled": true },
+    "sphere": { "enabled": true }
   }
 }
