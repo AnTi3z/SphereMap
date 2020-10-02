@@ -3,7 +3,7 @@ import logging
 from telethon import TelegramClient, events
 
 import config
-from modules import Module
+from modules import Modules
 
 logging.basicConfig(
     format='[%(asctime)s.%(msecs)d] %(levelname)s:%(name)s:%(funcName)s [lineno %(lineno)d] %(message)s',
@@ -37,7 +37,7 @@ if __name__ == "__main__":
     client = TelegramClient('AnTi3z', api['id'], api['hash'])
     client.start()
 
-    modules = Module(client, config.load_config())
+    modules = Modules(client, config.load_config())
     for module_name in modules.list_modules():
         load_module(module_name)
 

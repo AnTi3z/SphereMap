@@ -5,7 +5,7 @@ logger = logging.getLogger('Modules')
 logger.setLevel(logging.DEBUG)
 
 
-class Module:
+class Modules:
     def __init__(self, client, cfg):
         self.loaded_modules = {}
         self.config = cfg
@@ -15,19 +15,16 @@ class Module:
         importlib.invalidate_caches()
         return self.config['modules'].keys()
 
-    def load_module(self, mod, name):
+    def load_module(self, directory, name):
         try:
             module = self.loaded_modules.get(name)
             if not module:
-                module = importlib.import_module(f"{mod}.{name}")
+                module = importlib.import_module(f"{directory}.{name}")
                 self.loaded_modules[name] = module
             else:
                 module.unload(self.client)
                 importlib.reload(module)
 
-            logger.info(f"Module {mod}.{name} loaded")
+            logger.info(f"Module {directory}.{name} loaded")
         except Exception as e:
-            logger.error(f"Module {mod}.{name} loading error: {e}")
-
-    def get_module(self, name):
-        return self.loaded_modules.get(name)
+            logger.error(f"Module {directory}.{name} loading error: {e}")
