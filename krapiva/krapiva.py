@@ -29,7 +29,7 @@ def deactivate(client):
     client.remove_event_handler(krapiva)
 
 
-def load(client):
+def load(client, _):
     activate(client)
 
 

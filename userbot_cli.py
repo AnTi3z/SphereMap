@@ -17,13 +17,14 @@ modules = None
 
 def load_module(name):
     try:
-        config.configs[name] = config.load_config(file=f"{name}/config.json")
+        cfg = config.load_config(file=f"{name}/config.json")
     except FileNotFoundError as e:
+        cfg = None
         logger.error(e)
     modules.load_module(name, name)
     module = modules.loaded_modules.get(name)
     if module:
-        module.load(modules.client)
+        module.load(modules.client, cfg)
 
 
 @events.register(events.NewMessage(pattern=r"!load (.+)", outgoing=True))

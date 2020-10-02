@@ -1,9 +1,8 @@
-import config
 from modules import Module
 
 
-def load(client):
-    submodules = Module(client, config.configs['sphere'])
+def load(client, cfg):
+    submodules = Module(client, cfg)
     for module_name in submodules.list_modules():
         submodules.load_module("sphere", module_name)
         if submodules.config['modules'][module_name]['enabled']:
