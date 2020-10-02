@@ -21,10 +21,10 @@ async def krapiva(event):
 
 # There is no submodules, activate this script with no config
 def activate(client, _):
-    logger.info("Krapiva script activated")
     client.add_event_handler(krapiva)
+    logger.info("Krapiva script activated")
 
 
 def deactivate(client):
-    logger.info("Krapiva script deactivated")
     client.remove_event_handler(krapiva)
+    logger.info("Krapiva script deactivated")

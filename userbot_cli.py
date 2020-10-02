@@ -17,9 +17,9 @@ modules = None
 
 def load_module(name):
     try:
-        cfg = config.load_config(file=f"{name}/config.json")
+        module_cfg = config.load_config(file=f"{name}/config.json")
     except FileNotFoundError as e:
-        cfg = None
+        module_cfg = None
         logger.error(e)
     modules.load_module(name, name)
     module = modules.loaded_modules.get(name)
