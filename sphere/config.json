@@ -12,7 +12,7 @@
     },
     "stealer": {
       "enabled": true,
-      "attempts": 2
+      "attempts": 4
     },
     "mapper": {
       "enabled": false
