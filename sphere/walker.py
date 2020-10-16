@@ -6,6 +6,7 @@ import networkx as nx
 from telethon import events, functions
 
 from .db_models import *
+from . import tasks
 
 
 logger = logging.getLogger('Sphere.walker')
@@ -76,16 +77,24 @@ async def town_handler(event):
         for btn in row:
             btn_data.append(btn.data.decode('utf-8'))
 
-    # Если нарвались на торговца, телепорт и т.п. жмем "Уйти"
+    # Если включена тренировка, и мы у тренера - жмём её
     if 'cwa_training' in btn_data and WALKER_CFG['training']:
-        # Если включена тренировка, и мы у тренера - жмём её
         time.sleep(random.uniform(1.1, 2.5))
         await event.client(functions.messages.GetBotCallbackAnswerRequest(event.from_id, event.id,
                                                                           data='cwa_training'.encode("utf-8")))
-    elif 'cwa_nothing' in btn_data:
+        return
+
+    # Если нарвались на торговца, телепорт и т.п. жмем "Уйти"
+    if 'cwa_nothing' in btn_data:
         time.sleep(random.uniform(1.1, 2.5))
         await event.client(functions.messages.GetBotCallbackAnswerRequest(event.from_id, event.id,
                                                                           data='cwa_nothing'.encode("utf-8")))
+        return
+
+    # Если текущее задание воровать - возвращаемся в город
+    if tasks.CURRENT_TASK == tasks.Task.STEALING:
+        await event.client(functions.messages.GetBotCallbackAnswerRequest(event.from_id, event.id,
+                                                                          data='cwgoto_-1_-1'.encode("utf-8")))
         return
 
     # Координаты текущей комнаты
@@ -129,6 +138,8 @@ def activate(client, walker_cfg):
     load_graph(nx_map, 0.1, 0.01)
     client.add_event_handler(town_handler)
     client.add_event_handler(auto_return)
+    if WALKER_CFG['auto_walk']:
+        tasks.CURRENT_TASK = tasks.Task.WALKING
     logger.info("Walker script activated")
 
 

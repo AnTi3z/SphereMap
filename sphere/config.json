@@ -10,6 +10,10 @@
       "training": false,
       "auto_return": true
     },
+    "stealer": {
+      "enabled": true,
+      "attempts": 2
+    },
     "mapper": {
       "enabled": false
     }
