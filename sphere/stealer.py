@@ -7,7 +7,10 @@ from telethon import events, functions
 
 from . import tasks
 
-ATTEMPTS = 0
+STEALER_CFG = {}
+
+attempts = 0
+steal_list = []
 
 
 logger = logging.getLogger('Sphere.stealer')
@@ -20,7 +23,7 @@ async def ready_handler(event):
     if tasks.CURRENT_TASK == tasks.Task.STEALING:
         time.sleep(random.uniform(1.1, 2.5))
         await event.client.send_message(944268265, "🔮 Сфериум")
-        for _ in range(ATTEMPTS):
+        for _ in range(attempts):
             time.sleep(random.uniform(1.1, 2.5))
             await event.client.send_message(944268265, "🦹🏼‍♂️ Воровство")
 
@@ -34,8 +37,21 @@ async def ready_handler(event):
     pattern=r"(?s)^(?:Не найдя ничего лучше)|(?:Поискав подходящий случай)|(?:Побродив в округе)")
 )
 async def steal_handler(event):
-    if tasks.CURRENT_TASK == tasks.Task.STEALING:
-        print("ВОРУЕМ")
+    global attempts
+    attempts -= 1
+    steal_list.append((event.id, event.reply_markup.rows[0].buttons[1].data.decode('utf-8')))
+    if tasks.CURRENT_TASK == tasks.Task.STEALING and attempts == 0:
+        msg_id, btn_data = steal_list.pop(random.randrange(len(steal_list)))
+        attempts = STEALER_CFG["attempts"]
+        tasks.CURRENT_TASK = tasks.Task.NONE
+        await event.client(functions.messages.GetBotCallbackAnswerRequest(event.from_id,
+                                                                          msg_id,
+                                                                          data=btn_data.encode("utf-8")))
+
+        time.sleep(random.uniform(65, 70))
+        await event.client.send_message(944268265, "🔮 Сфериум")
+        time.sleep(random.uniform(1.1, 2.5))
+        await event.client.send_message(944268265, "🏡 Прогулка по городу")
 
 
 @events.register(events.MessageEdited(
@@ -62,14 +78,18 @@ async def wait_handler(event):
 
 
 def activate(client, stealer_cfg):
-    global ATTEMPTS
-    ATTEMPTS = stealer_cfg["attempts"]
+    global STEALER_CFG
+    global attempts
+    STEALER_CFG = stealer_cfg
+    attempts = STEALER_CFG["attempts"]
     client.add_event_handler(ready_handler)
+    client.add_event_handler(steal_handler)
     client.add_event_handler(wait_handler)
     logger.info("Stealer script activated")
 
 
 def deactivate(client):
     client.remove_event_handler(ready_handler)
+    client.remove_event_handler(steal_handler)
     client.remove_event_handler(wait_handler)
     logger.info("Stealer script deactivated")

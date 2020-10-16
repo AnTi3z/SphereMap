@@ -16,7 +16,7 @@ nx_map = nx.Graph()
 cur_room = None
 dst_room = None
 
-WALKER_CFG = None
+WALKER_CFG = {}
 
 
 def load_graph(graph, w1=1.0, w2=1.0):
@@ -91,8 +91,11 @@ async def town_handler(event):
                                                                           data='cwa_nothing'.encode("utf-8")))
         return
 
-    # Если текущее задание воровать - возвращаемся в город
-    if tasks.CURRENT_TASK == tasks.Task.STEALING:
+    if tasks.CURRENT_TASK == tasks.Task.NONE and WALKER_CFG['auto_walk']:
+        tasks.CURRENT_TASK = tasks.Task.WALKING
+
+    # Если текущее задание не гулять - возвращаемся в бараки
+    if tasks.CURRENT_TASK != tasks.Task.WALKING:
         await event.client(functions.messages.GetBotCallbackAnswerRequest(event.from_id, event.id,
                                                                           data='cwgoto_-1_-1'.encode("utf-8")))
         return
