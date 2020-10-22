@@ -22,7 +22,7 @@ class Modules:
                 module = importlib.import_module(f"{directory}.{name}")
                 self.loaded_modules[name] = module
             else:
-                module.unload(self.client)
+                module.deactivate(self.client)
                 importlib.reload(module)
 
             logger.info(f"Module {directory}.{name} loaded")
