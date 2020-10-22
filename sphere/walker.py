@@ -3,7 +3,7 @@ import random
 import time
 
 import networkx as nx
-from telethon import events, functions
+from telethon import events, functions, errors
 
 from .db_models import *
 from . import tasks
@@ -40,19 +40,17 @@ def load_graph(graph, w1=1.0, w2=1.0):
 
 
 def generate_dst():
-    global dst_room
-
     logger.debug("Generating new dst point!")
     if not cur_room:
         logger.warning("Can't generate path from None room")
-        return False
+        return None
 
     while True:
         # Генерируем произвольные координаты
-        dst_room = random.choice(list(nx_map.nodes))
+        dst = random.choice(list(nx_map.nodes))
         # Проверяем построение маршрута
-        if nx.has_path(nx_map, cur_room, dst_room):
-            return True
+        if nx.has_path(nx_map, cur_room, dst):
+            return dst
 
 
 # Возвращалка в город
@@ -96,8 +94,15 @@ async def town_handler(event):
 
     # Если текущее задание не гулять - возвращаемся в бараки
     if tasks.CURRENT_TASK != tasks.Task.WALKING:
-        await event.client(functions.messages.GetBotCallbackAnswerRequest(event.from_id, event.id,
-                                                                          data='cwgoto_-1_-1'.encode("utf-8")))
+        time.sleep(random.uniform(1.1, 2.5))
+        try:
+            await event.client(
+                functions.messages.GetBotCallbackAnswerRequest(event.from_id,
+                                                               event.id,
+                                                               data='cwgoto_-1_-1'.encode("utf-8"))
+            )
+        except errors.rpcerrorlist.BotResponseTimeoutError:
+            logger.warning(f"Goto barracks button answer timeout")
         return
 
     # Координаты текущей комнаты
@@ -111,7 +116,8 @@ async def town_handler(event):
         # Если конечная точка не определена или мы уже в конечной точке
         if (dst_room is None) or (cur_room == dst_room):
             # Генерируем новую конечную точку
-            if generate_dst():
+            dst_room = generate_dst()
+            if dst_room:
                 logger.debug(f"New dst point generated!")
 
     # Если не достигли цели или у нас новая цель
@@ -131,8 +137,14 @@ async def town_handler(event):
         # Если такая кнопка есть в списке - давим ее
         if next_btn_data in btn_data:
             time.sleep(random.uniform(1.3, 4.5))
-            await event.client(functions.messages.GetBotCallbackAnswerRequest(event.from_id, event.id,
-                                                                              data=next_btn_data.encode('utf-8')))
+            try:
+                await event.client(
+                    functions.messages.GetBotCallbackAnswerRequest(event.from_id,
+                                                                   event.id,
+                                                                   data=next_btn_data.encode('utf-8'))
+                )
+            except errors.MessageIdInvalidError:
+                logger.warning(f"Message with {next_btn_data} was deleted")
 
 
 def activate(client, walker_cfg):
