@@ -16,7 +16,7 @@ async def krapiva(event):
     time.sleep(random.uniform(0.9, 2.1))
     if event.reply_markup:
         btn_text = event.reply_markup.rows[0].buttons[0].text
-    await event.client.send_message(1196311609, btn_text)
+    await event.message.respond(btn_text)
 
 
 # There is no submodules, activate this script with no config

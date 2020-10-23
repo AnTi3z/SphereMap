@@ -46,10 +46,10 @@ async def ready_handler(event):
     attempts_left = STEALER_CFG["attempts"] - len(steal_list)
     if tasks.CURRENT_TASK == tasks.Task.STEALING and attempts_left > 0:
         time.sleep(random.uniform(1.1, 2.5))
-        await event.client.send_message(944268265, "🔮 Сфериум")
+        await event.message.respond("🔮 Сфериум")
         for _ in range(attempts_left):
             time.sleep(random.uniform(1.1, 2.5))
-            await event.client.send_message(944268265, "🦹🏼‍♂️ Воровство")
+            await event.message.respond("🦹🏼‍♂️ Воровство")
 
 
 @events.register(events.MessageEdited(
@@ -77,9 +77,9 @@ async def steal_handler(event):
 
         await asyncio.sleep(random.uniform(65, 70))  # Gap fo fighting
         time.sleep(random.uniform(1.1, 2.5))
-        await event.client.send_message(944268265, "🔮 Сфериум")
+        await event.message.respond("🔮 Сфериум")
         time.sleep(random.uniform(1.1, 2.5))
-        await event.client.send_message(944268265, "🏡 Прогулка по городу")
+        await event.message.respond("🏡 Прогулка по городу")
 
 
 @events.register(events.MessageEdited(

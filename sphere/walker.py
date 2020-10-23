@@ -58,9 +58,9 @@ def generate_dst():
 async def auto_return(event):
     if WALKER_CFG['auto_return']:
         time.sleep(random.uniform(1.1, 2.5))
-        await event.client.send_message(944268265, "🔮 Сфериум")
+        await event.message.respond("🔮 Сфериум")
         time.sleep(random.uniform(1.1, 2.5))
-        await event.client.send_message(944268265, "🏡 Прогулка по городу")
+        await event.message.respond("🏡 Прогулка по городу")
 
 
 @events.register(events.MessageEdited(chats=(944268265,), pattern=r"(?s)^Ты находишься на 🏡(.+?) (\d+)\s+(.+)"))
