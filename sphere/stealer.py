@@ -55,11 +55,11 @@ async def ready_handler(event):
 
 
 @events.register(events.MessageEdited(
-    chats=(944268265,),
+    chats=(BOT_ID,),
     pattern=r"(?s)^(?:Не найдя ничего лучше)|(?:Поискав подходящий случай)|(?:Побродив в округе)")
 )
 @events.register(events.NewMessage(
-    chats=(944268265,),
+    chats=(BOT_ID,),
     pattern=r"(?s)^(?:Не найдя ничего лучше)|(?:Поискав подходящий случай)|(?:Побродив в округе)")
 )
 async def steal_handler(event):
@@ -85,11 +85,11 @@ async def steal_handler(event):
 
 
 @events.register(events.MessageEdited(
-    chats=(944268265,),
+    chats=(BOT_ID,),
     pattern=r"(?s)^Тебе пока рано снова воровать.+через(?: (\d{1,2}) ч.)?(?: (\d{1,2}) м.)?(?: (\d{1,2}) с.)?")
 )
 @events.register(events.NewMessage(
-    chats=(944268265,),
+    chats=(BOT_ID,),
     pattern=r"(?s)^Тебе пока рано снова воровать.+через(?: (\d{1,2}) ч.)?(?: (\d{1,2}) м.)?(?: (\d{1,2}) с.)?")
 )
 async def wait_handler(event):
