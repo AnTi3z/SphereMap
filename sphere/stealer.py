@@ -13,16 +13,17 @@ STEALER_CFG = {}
 steal_list = []
 
 logger = logging.getLogger('Sphere.stealer')
-logger.setLevel(logging.DEBUG)
-
-
-def set_steal():
-    tasks.CURRENT_TASK = tasks.Task.STEALING
+logger.setLevel(logging.INFO)
 
 
 class StealTimer:
     def __init__(self):
         self._task = None
+
+    @staticmethod
+    def set_steal():
+        tasks.CURRENT_TASK = tasks.Task.STEALING
+        logger.info("It's steal time!")
 
     def stop(self):
         if self._task:
@@ -34,8 +35,8 @@ class StealTimer:
         tasks.CURRENT_TASK = tasks.Task.NONE
         steal_list.clear()
         delay_gap = delay + 15
-        self._task = asyncio.get_event_loop().call_later(delay_gap, set_steal)
-        logger.info(f"Таймер воровства установлен на {delay_gap} сек")
+        self._task = asyncio.get_event_loop().call_later(delay_gap, StealTimer.set_steal)
+        logger.info(f"Steal timer started for {delay_gap} sec")
 
 
 steal_timer = StealTimer()
