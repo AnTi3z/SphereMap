@@ -77,7 +77,7 @@ async def steal_handler(event):
 
         steal_timer.set(7200)  # two hours
 
-        await asyncio.sleep(random.uniform(65, 70))  # Gap fo fighting
+        await asyncio.sleep(random.uniform(200, 250))  # Gap fo fighting
         time.sleep(random.uniform(1.1, 2.5))
         await event.message.respond("🔮 Сфериум")
         time.sleep(random.uniform(1.1, 2.5))
