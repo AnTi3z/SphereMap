@@ -8,9 +8,11 @@ btn_text = '🏌🏻'
 logger = logging.getLogger('Krapiva')
 logger.setLevel(logging.INFO)
 
+BOT_ID = 1196311609
+
 
 # КРАПИВАААААААААААААА
-@events.register(events.NewMessage(chats=(1196311609,), incoming=True))
+@events.register(events.NewMessage(chats=(BOT_ID,), incoming=True))
 async def krapiva(event):
     global btn_text
     time.sleep(random.uniform(0.9, 2.1))

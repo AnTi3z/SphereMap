@@ -1,5 +1,6 @@
 from modules import Modules
 
+BOT_ID = 944268265
 submodules: Modules
 
 

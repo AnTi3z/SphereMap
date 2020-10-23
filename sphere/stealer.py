@@ -6,6 +6,7 @@ import random
 from telethon import events, functions
 
 from . import tasks
+from .sphere import BOT_ID
 
 STEALER_CFG = {}
 
@@ -40,8 +41,8 @@ class StealTimer:
 steal_timer = StealTimer()
 
 
-@events.register(events.MessageEdited(chats=(944268265,), pattern=r"(?s)^🧙🏻‍♂️.+❤️\d+.+🛡\d+.+👊"))
-@events.register(events.NewMessage(chats=(944268265,), pattern=r"(?s)^🧙🏻‍♂️.+❤️\d+.+🛡\d+.+👊"))
+@events.register(events.MessageEdited(chats=(BOT_ID,), pattern=r"(?s)^🧙🏻‍♂️.+❤️\d+.+🛡\d+.+👊"))
+@events.register(events.NewMessage(chats=(BOT_ID,), pattern=r"(?s)^🧙🏻‍♂️.+❤️\d+.+🛡\d+.+👊"))
 async def ready_handler(event):
     attempts_left = STEALER_CFG["attempts"] - len(steal_list)
     if tasks.CURRENT_TASK == tasks.Task.STEALING and attempts_left > 0:

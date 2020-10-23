@@ -7,6 +7,7 @@ from telethon import events, errors
 
 from .db_models import *
 from . import tasks
+from .sphere import BOT_ID
 
 
 logger = logging.getLogger('Sphere.walker')
@@ -54,7 +55,7 @@ def generate_dst():
 
 
 # Возвращалка в город
-@events.register(events.NewMessage(chats=(944268265,), pattern=r"Твоё ❤️ здоровье и 🛡 щит полностью восстановились!"))
+@events.register(events.NewMessage(chats=(BOT_ID,), pattern=r"Твоё ❤️ здоровье и 🛡 щит полностью восстановились!"))
 async def auto_return(event):
     if WALKER_CFG['auto_return']:
         time.sleep(random.uniform(1.1, 2.5))
@@ -63,8 +64,8 @@ async def auto_return(event):
         await event.message.respond("🏡 Прогулка по городу")
 
 
-@events.register(events.MessageEdited(chats=(944268265,), pattern=r"(?s)^Ты находишься на 🏡(.+?) (\d+)\s+(.+)"))
-@events.register(events.NewMessage(chats=(944268265,), pattern=r"(?s)^Ты находишься на 🏡(.+?) (\d+)\s+(.+)"))
+@events.register(events.MessageEdited(chats=(BOT_ID,), pattern=r"(?s)^Ты находишься на 🏡(.+?) (\d+)\s+(.+)"))
+@events.register(events.NewMessage(chats=(BOT_ID,), pattern=r"(?s)^Ты находишься на 🏡(.+?) (\d+)\s+(.+)"))
 async def town_handler(event):
     global cur_room
     global dst_room
