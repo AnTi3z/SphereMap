@@ -5,6 +5,7 @@
   },
   "modules": {
     "krapiva": { "enabled": true },
-    "sphere": { "enabled": true }
+    "sphere": { "enabled": true },
+    "bs": { "enabled": true }
   }
 }
