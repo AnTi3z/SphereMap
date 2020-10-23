@@ -87,11 +87,14 @@ async def town_handler(event):
         await event.message.click(data=b'cwa_nothing')
         return
 
+    # Проверяем текущее задание и настройку автогуляния
     if tasks.CURRENT_TASK == tasks.Task.NONE and WALKER_CFG['auto_walk']:
         tasks.CURRENT_TASK = tasks.Task.WALKING
+    elif tasks.CURRENT_TASK == tasks.Task.WALKING and not WALKER_CFG['auto_walk']:
+        tasks.CURRENT_TASK = tasks.Task.NONE
 
     # Если текущее задание не гулять - возвращаемся в бараки
-    if tasks.CURRENT_TASK != tasks.Task.WALKING:
+    if tasks.CURRENT_TASK not in (tasks.Task.WALKING, tasks.Task.NONE):
         time.sleep(random.uniform(1.1, 2.5))
         try:
             await event.message.click(data=b'cwgoto_-1_-1')
@@ -105,14 +108,14 @@ async def town_handler(event):
     y = int(event.pattern_match.group(2))
     cur_room = (x, y)
 
-    # Если включено авто-гуляние
-    if WALKER_CFG['auto_walk']:
-        # Если конечная точка не определена или мы уже в конечной точке
-        if (dst_room is None) or (cur_room == dst_room):
-            # Генерируем новую конечную точку
-            dst_room = generate_dst()
-            if dst_room:
-                logger.debug(f"New dst point generated!")
+    # # Если включено авто-гуляние
+    # if WALKER_CFG['auto_walk']:
+    # Если конечная точка не определена или мы уже в конечной точке
+    if (dst_room is None) or (cur_room == dst_room):
+        # Генерируем новую конечную точку
+        dst_room = generate_dst()
+        if dst_room:
+            logger.debug(f"New dst point generated!")
 
     # Если не достигли цели или у нас новая цель
     if dst_room and (cur_room != dst_room):
@@ -143,8 +146,8 @@ def activate(client, walker_cfg):
     load_graph(nx_map, 0.1, 0.01)
     client.add_event_handler(town_handler)
     client.add_event_handler(auto_return)
-    if WALKER_CFG['auto_walk']:
-        tasks.CURRENT_TASK = tasks.Task.WALKING
+    # if WALKER_CFG['auto_walk']:
+    #     tasks.CURRENT_TASK = tasks.Task.WALKING
     logger.info("Walker script activated")
 
 
