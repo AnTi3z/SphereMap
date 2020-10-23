@@ -3,7 +3,7 @@ import random
 import time
 
 import networkx as nx
-from telethon import events, functions, errors
+from telethon import events, errors
 
 from .db_models import *
 from . import tasks
@@ -78,15 +78,13 @@ async def town_handler(event):
     # Если включена тренировка, и мы у тренера - жмём её
     if 'cwa_training' in btn_data and WALKER_CFG['training']:
         time.sleep(random.uniform(1.1, 2.5))
-        await event.client(functions.messages.GetBotCallbackAnswerRequest(event.from_id, event.id,
-                                                                          data='cwa_training'.encode("utf-8")))
+        await event.message.click(data=b'cwa_training')
         return
 
     # Если нарвались на торговца, телепорт и т.п. жмем "Уйти"
     if 'cwa_nothing' in btn_data:
         time.sleep(random.uniform(1.1, 2.5))
-        await event.client(functions.messages.GetBotCallbackAnswerRequest(event.from_id, event.id,
-                                                                          data='cwa_nothing'.encode("utf-8")))
+        await event.message.click(data=b'cwa_nothing')
         return
 
     if tasks.CURRENT_TASK == tasks.Task.NONE and WALKER_CFG['auto_walk']:
@@ -96,11 +94,7 @@ async def town_handler(event):
     if tasks.CURRENT_TASK != tasks.Task.WALKING:
         time.sleep(random.uniform(1.1, 2.5))
         try:
-            await event.client(
-                functions.messages.GetBotCallbackAnswerRequest(event.from_id,
-                                                               event.id,
-                                                               data='cwgoto_-1_-1'.encode("utf-8"))
-            )
+            await event.message.click(data=b'cwgoto_-1_-1')
         except errors.rpcerrorlist.BotResponseTimeoutError:
             logger.warning(f"Goto barracks button answer timeout")
         return
@@ -138,11 +132,7 @@ async def town_handler(event):
         if next_btn_data in btn_data:
             time.sleep(random.uniform(1.3, 4.5))
             try:
-                await event.client(
-                    functions.messages.GetBotCallbackAnswerRequest(event.from_id,
-                                                                   event.id,
-                                                                   data=next_btn_data.encode('utf-8'))
-                )
+                await event.message.click(data=next_btn_data.encode('utf-8'))
             except errors.MessageIdInvalidError:
                 logger.warning(f"Message with {next_btn_data} was deleted")
 
