@@ -75,10 +75,7 @@ async def town_handler(event):
     global dst_room
 
     # Загружаем кнопки в список
-    btn_data = list()
-    for row in event.message.buttons:
-        for btn in row:
-            btn_data.append(btn.data.decode('utf-8'))
+    btn_data = [btn.data.decode('utf-8') for btn in itertools.chain.from_iterable(event.message.buttons)]
 
     # Если включена тренировка, и мы у тренера - жмём её
     if 'cwa_training' in btn_data and WALKER_CFG['training']:
