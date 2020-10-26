@@ -54,8 +54,12 @@ def generate_dst():
             return dst
 
 
+_heal_re = r"Твоё ❤️ здоровье и 🛡 щит полностью восстановились!"
+_town_re = r"(?s)^Ты находишься на 🏡(.+?) (\d+)\s+(.+)"
+
+
 # Возвращалка в город
-@events.register(events.NewMessage(chats=(BOT_ID,), pattern=r"Твоё ❤️ здоровье и 🛡 щит полностью восстановились!"))
+@events.register(events.NewMessage(chats=(BOT_ID,), pattern=_heal_re))
 async def auto_return(event):
     if WALKER_CFG['auto_return']:
         time.sleep(random.uniform(1.1, 2.5))
@@ -64,8 +68,8 @@ async def auto_return(event):
         await event.message.respond("🏡 Прогулка по городу")
 
 
-@events.register(events.MessageEdited(chats=(BOT_ID,), pattern=r"(?s)^Ты находишься на 🏡(.+?) (\d+)\s+(.+)"))
-@events.register(events.NewMessage(chats=(BOT_ID,), pattern=r"(?s)^Ты находишься на 🏡(.+?) (\d+)\s+(.+)"))
+@events.register(events.MessageEdited(chats=(BOT_ID,), pattern=_town_re))
+@events.register(events.NewMessage(chats=(BOT_ID,), pattern=_town_re))
 async def town_handler(event):
     global cur_room
     global dst_room

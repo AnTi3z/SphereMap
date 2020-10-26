@@ -41,9 +41,13 @@ class StealTimer:
 
 steal_timer = StealTimer()
 
+_ready_re = r"(?s)^🧙🏻‍♂️.+❤️\d+.+🛡\d+.+👊"
+_steal_re = r"(?s)^(?:Не найдя ничего лучше)|(?:Поискав подходящий случай)|(?:Побродив в округе)"
+_wait_re = r"(?s)^Тебе пока рано снова воровать.+через(?: (\d{1,2}) ч.)?(?: (\d{1,2}) м.)?(?: (\d{1,2}) с.)?"
 
-@events.register(events.MessageEdited(chats=(BOT_ID,), pattern=r"(?s)^🧙🏻‍♂️.+❤️\d+.+🛡\d+.+👊"))
-@events.register(events.NewMessage(chats=(BOT_ID,), pattern=r"(?s)^🧙🏻‍♂️.+❤️\d+.+🛡\d+.+👊"))
+
+@events.register(events.MessageEdited(chats=(BOT_ID,), pattern=_ready_re))
+@events.register(events.NewMessage(chats=(BOT_ID,), pattern=_ready_re))
 async def ready_handler(event):
     attempts_left = STEALER_CFG["attempts"] - len(steal_list)
     if tasks.CURRENT_TASK == tasks.Task.STEALING and attempts_left > 0:
@@ -54,14 +58,8 @@ async def ready_handler(event):
             await event.message.respond("🦹🏼‍♂️ Воровство")
 
 
-@events.register(events.MessageEdited(
-    chats=(BOT_ID,),
-    pattern=r"(?s)^(?:Не найдя ничего лучше)|(?:Поискав подходящий случай)|(?:Побродив в округе)")
-)
-@events.register(events.NewMessage(
-    chats=(BOT_ID,),
-    pattern=r"(?s)^(?:Не найдя ничего лучше)|(?:Поискав подходящий случай)|(?:Побродив в округе)")
-)
+@events.register(events.MessageEdited(chats=(BOT_ID,), pattern=_steal_re))
+@events.register(events.NewMessage(chats=(BOT_ID,), pattern=_steal_re))
 async def steal_handler(event):
     logger.debug(f"New steal message with button: {event.reply_markup.rows[0].buttons[1].data.decode('utf-8')}")
     steal_list.append((event.id, event.reply_markup.rows[0].buttons[1].data.decode('utf-8')))
@@ -84,14 +82,8 @@ async def steal_handler(event):
         await event.message.respond("🏡 Прогулка по городу")
 
 
-@events.register(events.MessageEdited(
-    chats=(BOT_ID,),
-    pattern=r"(?s)^Тебе пока рано снова воровать.+через(?: (\d{1,2}) ч.)?(?: (\d{1,2}) м.)?(?: (\d{1,2}) с.)?")
-)
-@events.register(events.NewMessage(
-    chats=(BOT_ID,),
-    pattern=r"(?s)^Тебе пока рано снова воровать.+через(?: (\d{1,2}) ч.)?(?: (\d{1,2}) м.)?(?: (\d{1,2}) с.)?")
-)
+@events.register(events.MessageEdited(chats=(BOT_ID,), pattern=_wait_re))
+@events.register(events.NewMessage(chats=(BOT_ID,), pattern=_wait_re))
 async def wait_handler(event):
     time_remain = 0
     if event.pattern_match.group(1):
