@@ -95,12 +95,49 @@ async def wait_handler(event):
     steal_timer.set(time_remain)
 
 
+_steal_money_re = r"(?s)^Ты выкрал из кошелька бедолаги 💰(\d+)!$"
+_steal_fight_re = r"(?s)^Кража не удалась, драка неизбежна!$"
+_steal_empty_re = r"(?s)^Увы, ничего украсть не удалось. Зато и не прилетело по башке.$"
+_steal_box_re = r"(?s)^Тебе удалось украсть (.+)!$"  # контейнер
+_steal_item_re = r"(?s)^Тебе удалось своровать (.+)!$"  # билет/ключ
+
+
+@events.register(events.NewMessage(chats=(BOT_ID,), pattern=_steal_money_re))
+async def steal1_handler(event):
+    logger.info(f"Steal money: {event.pattern_match.group(1)}")
+
+
+@events.register(events.NewMessage(chats=(BOT_ID,), pattern=_steal_fight_re))
+async def steal2_handler(event):
+    logger.info(f"Steal with fight!")
+
+
+@events.register(events.NewMessage(chats=(BOT_ID,), pattern=_steal_empty_re))
+async def steal3_handler(event):
+    logger.info(f"Steal with nothing!")
+
+
+@events.register(events.NewMessage(chats=(BOT_ID,), pattern=_steal_box_re))
+async def steal4_handler(event):
+    logger.info(f"Steal box: {event.pattern_match.group(1)}")
+
+
+@events.register(events.NewMessage(chats=(BOT_ID,), pattern=_steal_item_re))
+async def steal5_handler(event):
+    logger.info(f"Steal jackpot: {event.pattern_match.group(1)}")
+
+
 def activate(client, stealer_cfg):
     global STEALER_CFG
     STEALER_CFG = stealer_cfg
     client.add_event_handler(ready_handler)
     client.add_event_handler(steal_handler)
     client.add_event_handler(wait_handler)
+    client.add_event_handler(steal1_handler)
+    client.add_event_handler(steal2_handler)
+    client.add_event_handler(steal3_handler)
+    client.add_event_handler(steal4_handler)
+    client.add_event_handler(steal5_handler)
     logger.info("Stealer script activated")
 
 
