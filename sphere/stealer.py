@@ -1,16 +1,14 @@
-import logging
 import asyncio
-import time
+import logging
 import random
+import time
 
 from telethon import events, functions
 
-from . import tasks
-from .sphere import BOT_ID
+from .sphere import BOT_ID, global_state, Task
 
 STEALER_CFG = {}
 
-steal_list = []
 
 logger = logging.getLogger('Sphere.stealer')
 logger.setLevel(logging.INFO)
@@ -22,7 +20,7 @@ class StealTimer:
 
     @staticmethod
     def set_steal():
-        tasks.CURRENT_TASK = tasks.Task.STEALING
+        global_state['task'] = Task.STEALING
         logger.info("It's steal time!")
 
     def stop(self):
@@ -32,13 +30,14 @@ class StealTimer:
 
     def set(self, delay):
         self.stop()
-        tasks.CURRENT_TASK = tasks.Task.NONE
+        global_state['task'] = Task.NONE
         steal_list.clear()
         delay_gap = delay + 15
-        self._task = asyncio.get_event_loop().call_later(delay_gap, StealTimer.set_steal)
+        self._task = asyncio.get_event_loop().call_later(delay_gap, self.set_steal)
         logger.info(f"Steal timer started for {delay_gap} sec")
 
 
+steal_list = []
 steal_timer = StealTimer()
 
 _ready_re = r"(?s)^🧙🏻‍♂️.+❤️\d+.+🛡\d+.+👊"
@@ -50,7 +49,7 @@ _wait_re = r"(?s)^Тебе пока рано снова воровать.+чер
 @events.register(events.NewMessage(chats=(BOT_ID,), pattern=_ready_re))
 async def ready_handler(event):
     attempts_left = STEALER_CFG["attempts"] - len(steal_list)
-    if tasks.CURRENT_TASK == tasks.Task.STEALING and attempts_left > 0:
+    if global_state['task'] == Task.STEALING and attempts_left > 0:
         time.sleep(random.uniform(1.1, 2.5))
         await event.message.respond("🔮 Сфериум")
         for _ in range(attempts_left):
@@ -62,11 +61,11 @@ async def ready_handler(event):
 @events.register(events.NewMessage(chats=(BOT_ID,), pattern=_steal_re))
 async def steal_handler(event):
     logger.debug(f"New steal message with button: {event.reply_markup.rows[0].buttons[1].data.decode('utf-8')}")
-    steal_list.append((event.id, event.reply_markup.rows[0].buttons[1].data.decode('utf-8')))
+    steal_list.append((event.id, event.message.buttons[0][1].data.decode('utf-8')))
     logger.debug(f"Steal list: {steal_list}")
-    if tasks.CURRENT_TASK == tasks.Task.STEALING and len(steal_list) >= STEALER_CFG["attempts"]:
+    if global_state['task'] == Task.STEALING and len(steal_list) >= STEALER_CFG["attempts"]:
         msg_id, btn_data = random.choice(steal_list)
-        logger.debug(f"Push! msg:{msg_id} btn_data: {btn_data}")
+        logger.info(f"Steal with btn_data: {btn_data}")
         await event.client(
             functions.messages.GetBotCallbackAnswerRequest(event.from_id,
                                                            msg_id,

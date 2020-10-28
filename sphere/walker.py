@@ -1,13 +1,13 @@
 import logging
 import random
 import time
+import itertools
 
 import networkx as nx
 from telethon import events, errors
 
 from .db_models import *
-from . import tasks
-from .sphere import BOT_ID
+from .sphere import BOT_ID, global_state, Task
 
 
 logger = logging.getLogger('Sphere.walker')
@@ -54,6 +54,18 @@ def generate_dst():
             return dst
 
 
+async def try_click(msg, data):
+    time.sleep(random.uniform(1.1, 2.5))
+    global_state['last_button'] = (msg.id, data)
+    try:
+        await msg.click(data=data.encode('utf-8'))
+        global_state['last_button'] = None
+    except errors.BotResponseTimeoutError:
+        logger.warning(f"Button {data} answer timeout")
+    except errors.MessageIdInvalidError:
+        logger.warning(f"Message with {data} was deleted")
+
+
 _heal_re = r"Твоё ❤️ здоровье и 🛡 щит полностью восстановились!"
 _town_re = r"(?s)^Ты находишься на 🏡(.+?) (\d+)\s+(.+)"
 
@@ -79,29 +91,24 @@ async def town_handler(event):
 
     # Если включена тренировка, и мы у тренера - жмём её
     if 'cwa_training' in btn_data and WALKER_CFG['training']:
-        time.sleep(random.uniform(1.1, 2.5))
-        await event.message.click(data=b'cwa_training')
+        await try_click(event.message, 'cwa_training')
         return
 
     # Если нарвались на торговца, телепорт и т.п. жмем "Уйти"
     if 'cwa_nothing' in btn_data:
-        time.sleep(random.uniform(1.1, 2.5))
-        await event.message.click(data=b'cwa_nothing')
+        await try_click(event.message, 'cwa_nothing')
         return
 
     # Проверяем текущее задание и настройку автогуляния
-    if tasks.CURRENT_TASK == tasks.Task.NONE and WALKER_CFG['auto_walk']:
-        tasks.CURRENT_TASK = tasks.Task.WALKING
-    elif tasks.CURRENT_TASK == tasks.Task.WALKING and not WALKER_CFG['auto_walk']:
-        tasks.CURRENT_TASK = tasks.Task.NONE
+    if global_state['task'] == Task.NONE and WALKER_CFG['auto_walk']:
+        global_state['task'] = Task.WALKING
+    elif global_state['task'] == Task.WALKING and not WALKER_CFG['auto_walk']:
+        global_state['task'] = Task.NONE
 
     # Если текущее задание не гулять - возвращаемся в бараки
-    if tasks.CURRENT_TASK not in (tasks.Task.WALKING, tasks.Task.NONE):
+    if global_state['task'] not in (Task.WALKING, Task.NONE):
         time.sleep(random.uniform(1.1, 2.5))
-        try:
-            await event.message.click(data=b'cwgoto_-1_-1')
-        except errors.rpcerrorlist.BotResponseTimeoutError:
-            logger.warning(f"Goto barracks button answer timeout")
+        await try_click(event.message, 'cwgoto_-1_-1')
         return
 
     # Координаты текущей комнаты
@@ -110,8 +117,6 @@ async def town_handler(event):
     y = int(event.pattern_match.group(2))
     cur_room = (x, y)
 
-    # # Если включено авто-гуляние
-    # if WALKER_CFG['auto_walk']:
     # Если конечная точка не определена или мы уже в конечной точке
     if (dst_room is None) or (cur_room == dst_room):
         # Генерируем новую конечную точку
@@ -135,11 +140,8 @@ async def town_handler(event):
 
         # Если такая кнопка есть в списке - давим ее
         if next_btn_data in btn_data:
-            time.sleep(random.uniform(1.3, 4.5))
-            try:
-                await event.message.click(data=next_btn_data.encode('utf-8'))
-            except errors.MessageIdInvalidError:
-                logger.warning(f"Message with {next_btn_data} was deleted")
+            time.sleep(random.uniform(0.2, 2.0))
+            await try_click(event.message, next_btn_data)
 
 
 def activate(client, walker_cfg):
@@ -148,8 +150,6 @@ def activate(client, walker_cfg):
     load_graph(nx_map, 0.1, 0.01)
     client.add_event_handler(town_handler)
     client.add_event_handler(auto_return)
-    # if WALKER_CFG['auto_walk']:
-    #     tasks.CURRENT_TASK = tasks.Task.WALKING
     logger.info("Walker script activated")
 
 
