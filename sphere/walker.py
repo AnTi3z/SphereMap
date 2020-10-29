@@ -14,7 +14,6 @@ logger = logging.getLogger('Sphere.walker')
 logger.setLevel(logging.INFO)
 
 nx_map = nx.Graph()
-cur_room = None
 dst_room = None
 
 WALKER_CFG = {}
@@ -40,9 +39,9 @@ def load_graph(graph, w1=1.0, w2=1.0):
     database.close()
 
 
-def generate_dst():
+def generate_dst(src):
     logger.debug("Generating new dst point!")
-    if not cur_room:
+    if not src:
         logger.warning("Can't generate path from None room")
         return None
 
@@ -50,7 +49,7 @@ def generate_dst():
         # Генерируем произвольные координаты
         dst = random.choice(list(nx_map.nodes))
         # Проверяем построение маршрута
-        if nx.has_path(nx_map, cur_room, dst):
+        if nx.has_path(nx_map, src, dst):
             return dst
 
 
@@ -83,7 +82,6 @@ async def auto_return(event):
 @events.register(events.MessageEdited(chats=(BOT_ID,), pattern=_town_re))
 @events.register(events.NewMessage(chats=(BOT_ID,), pattern=_town_re))
 async def town_handler(event):
-    global cur_room
     global dst_room
 
     # Загружаем кнопки в словарь {button_data: button}
@@ -120,7 +118,7 @@ async def town_handler(event):
     # Если конечная точка не определена или мы уже в конечной точке
     if (dst_room is None) or (cur_room == dst_room):
         # Генерируем новую конечную точку
-        dst_room = generate_dst()
+        dst_room = generate_dst(cur_room)
         if dst_room:
             logger.debug(f"New dst point generated!")
 
