@@ -3,15 +3,17 @@ import logging
 import random
 import time
 
-from telethon import events, functions
+from telethon import events, TelegramClient
 
 from .sphere import BOT_ID, global_state, Task
-
-STEALER_CFG = {}
 
 
 logger = logging.getLogger('Sphere.stealer')
 logger.setLevel(logging.INFO)
+
+client: TelegramClient
+
+STEALER_CFG = {}
 
 
 class StealTimer:
@@ -123,9 +125,11 @@ async def steal6_handler(event):
     logger.info(f"Failed steal(stone)")
 
 
-def activate(client, stealer_cfg):
+def activate(cli, cfg):
+    global client
     global STEALER_CFG
-    STEALER_CFG = stealer_cfg
+    client = cli
+    STEALER_CFG = cfg
     client.add_event_handler(ready_handler)
     client.add_event_handler(steal_handler)
     client.add_event_handler(wait_handler)
@@ -138,8 +142,9 @@ def activate(client, stealer_cfg):
     logger.info("Stealer script activated")
 
 
-def deactivate(client):
-    client.remove_event_handler(ready_handler)
-    client.remove_event_handler(steal_handler)
-    client.remove_event_handler(wait_handler)
-    logger.info("Stealer script deactivated")
+def deactivate():
+    if client:
+        client.remove_event_handler(ready_handler)
+        client.remove_event_handler(steal_handler)
+        client.remove_event_handler(wait_handler)
+        logger.info("Stealer script deactivated")

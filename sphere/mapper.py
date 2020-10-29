@@ -1,7 +1,7 @@
 import logging
 import re
 
-from telethon import events
+from telethon import events, TelegramClient
 
 import sphere.db_sphere as db_sphere
 from .db_models import *
@@ -11,6 +11,7 @@ logger.setLevel(logging.INFO)
 
 bandit = False
 entry = False
+client: TelegramClient
 
 
 def db_room_parse(room, user, date, entry_flag=False):
@@ -82,15 +83,18 @@ async def town_handler(event):
     await event.client.inline_query('SpheriumMapperBot', "new_map_event")
 
 
-def activate(client, _):
+def activate(cli, _):
+    global client
+    client = cli
     client.add_event_handler(bandit_handler)
     client.add_event_handler(entry_handler)
     client.add_event_handler(town_handler)
-    logger.info("Walker script activated")
+    logger.info("Mapper script activated")
 
 
-def deactivate(client):
-    client.remove_event_handler(bandit_handler)
-    client.remove_event_handler(entry_handler)
-    client.remove_event_handler(town_handler)
-    logger.info("Walker script deactivated")
+def deactivate():
+    if client:
+        client.remove_event_handler(bandit_handler)
+        client.remove_event_handler(entry_handler)
+        client.remove_event_handler(town_handler)
+        logger.info("Mapper script deactivated")

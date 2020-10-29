@@ -3,7 +3,7 @@ import logging
 from enum import Enum
 from typing import TypedDict, Optional
 
-from telethon import events, errors
+from telethon import events, errors, TelegramClient
 from telethon.tl.custom import MessageButton
 
 from modules import Modules
@@ -19,6 +19,7 @@ class Task(Enum):
 
 BOT_ID = 944268265
 submodules: Modules
+client: TelegramClient
 
 global_state = TypedDict('global_state',
                          {'task': Optional[Task], 'last_button': Optional[MessageButton]})
@@ -46,9 +47,11 @@ async def retry(event):
 
 
 # Load submodules and activate them
-def activate(client, cfg):
+def activate(cli, cfg):
+    global client
     global submodules
-    submodules = Modules(client, cfg)
+    client = cli
+    submodules = Modules(cfg)
     for module_name in submodules.list_modules():
         module = submodules.load_module("sphere", module_name)
         module_cfg = cfg['modules'][module_name]
@@ -56,7 +59,7 @@ def activate(client, cfg):
             module.activate(client, module_cfg)
 
 
-def deactivate(client):
+def deactivate():
     if submodules:
         for module in submodules.loaded_modules.values():
-            module.deactivate(client)
+            module.deactivate()

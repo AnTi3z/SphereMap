@@ -12,7 +12,8 @@ logging.basicConfig(
 logger = logging.getLogger('UserbotCli')
 logger.setLevel(logging.DEBUG)
 
-modules = None
+# modules: Modules
+# client: TelegramClient
 
 
 def load_module(name):
@@ -23,7 +24,7 @@ def load_module(name):
         except FileNotFoundError as e:
             module_cfg = None
             logger.error(e)
-        module.activate(modules.client, module_cfg)
+        module.activate(client, module_cfg)
 
 
 @events.register(events.NewMessage(pattern=r"!load (.+)", outgoing=True))
@@ -36,7 +37,7 @@ if __name__ == "__main__":
     client = TelegramClient('AnTi3z', api['id'], api['hash'])
     client.start()
 
-    modules = Modules(client, config.load_config())
+    modules = Modules(config.load_config())
     for module_name in modules.list_modules():
         load_module(module_name)
 

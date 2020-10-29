@@ -4,7 +4,7 @@ import time
 import itertools
 
 import networkx as nx
-from telethon import events, errors
+from telethon import events, errors, TelegramClient
 
 from .db_models import *
 from .sphere import BOT_ID, global_state, Task
@@ -15,6 +15,7 @@ logger.setLevel(logging.INFO)
 
 nx_map = nx.Graph()
 dst_room = None
+client: TelegramClient
 
 WALKER_CFG = {}
 
@@ -140,16 +141,19 @@ async def town_handler(event):
             await try_click(buttons[next_btn_data])
 
 
-def activate(client, walker_cfg):
+def activate(cli, cfg):
+    global client
     global WALKER_CFG
-    WALKER_CFG = walker_cfg
+    client = cli
+    WALKER_CFG = cfg
     load_graph(nx_map, 0.1, 0.01)
     client.add_event_handler(town_handler)
     client.add_event_handler(auto_return)
     logger.info("Walker script activated")
 
 
-def deactivate(client):
-    client.remove_event_handler(town_handler)
-    client.remove_event_handler(auto_return)
-    logger.info("Walker script deactivated")
+def deactivate():
+    if client:
+        client.remove_event_handler(town_handler)
+        client.remove_event_handler(auto_return)
+        logger.info("Walker script deactivated")
