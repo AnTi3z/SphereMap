@@ -1,8 +1,10 @@
 import asyncio
 import logging
 from enum import Enum
+from typing import TypedDict, Optional
 
-from telethon import events, functions, errors
+from telethon import events, errors
+from telethon.tl.custom import MessageButton
 
 from modules import Modules
 
@@ -19,10 +21,8 @@ class Task(Enum):
 BOT_ID = 944268265
 submodules: Modules
 
-global_state = {
-    "task": Task.NONE,
-    "last_button": None
-}
+global_state = TypedDict('global_state',
+                         {'task': Optional[Task], 'last_button': Optional[MessageButton]})
 
 
 # Не сработала кнопка
