@@ -97,12 +97,12 @@ async def town_handler(event):
         await try_click(buttons['cwa_nothing'])
         return
 
-    # Проверяем текущее задание и настройку автогуляния
-    if global_state['task'] == Task.NONE:
+    # Если нет других заданий - включаем автогуляние
+    if not global_state['task']:
         global_state['task'] = Task.WALKING
 
     # Если текущее задание не гулять - возвращаемся в бараки
-    if global_state['task'] not in (Task.WALKING, Task.NONE):
+    if global_state['task'] != Task.WALKING:
         time.sleep(random.uniform(1.1, 2.5))
         await try_click(buttons['cwgoto_-1_-1'])
         return

@@ -30,7 +30,7 @@ class StealTimer:
 
     def set(self, delay):
         self.stop()
-        global_state['task'] = Task.NONE
+        global_state['task'] = None
         delay_gap = delay + 15
         self._task = asyncio.get_event_loop().call_later(delay_gap, self.set_steal)
         logger.info(f"Steal timer started for {delay_gap} sec")

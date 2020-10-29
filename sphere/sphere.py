@@ -15,7 +15,6 @@ logger.setLevel(logging.INFO)
 class Task(Enum):
     WALKING = 1
     STEALING = 2
-    NONE = 3
 
 
 BOT_ID = 944268265
