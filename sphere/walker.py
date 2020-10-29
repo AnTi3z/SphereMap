@@ -98,10 +98,8 @@ async def town_handler(event):
         return
 
     # Проверяем текущее задание и настройку автогуляния
-    if global_state['task'] == Task.NONE and WALKER_CFG['auto_walk']:
+    if global_state['task'] == Task.NONE:
         global_state['task'] = Task.WALKING
-    elif global_state['task'] == Task.WALKING and not WALKER_CFG['auto_walk']:
-        global_state['task'] = Task.NONE
 
     # Если текущее задание не гулять - возвращаемся в бараки
     if global_state['task'] not in (Task.WALKING, Task.NONE):
