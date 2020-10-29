@@ -31,22 +31,19 @@ async def retry(event):
     # Ждем 15 секунд
     await asyncio.sleep(15)
     if global_state['last_button']:
+        btn_data = global_state['last_button'].data.decode()
         try:
-            logger.debug(f"Button {['last_button'][1]} retry click")
-            await event.client(
-                functions.messages.GetBotCallbackAnswerRequest(event.from_id,
-                                                               global_state['last_button'][0],
-                                                               data=global_state['last_button'][1].encode("utf-8"))
-            )
+            logger.debug(f"Button {btn_data} retry click")
+            await global_state['last_button'].click()
             # Кнопка прожалась, все ок
             global_state['last_button'] = None
-            logger.info(f"Button {['last_button'][1]} retry click success")
+            logger.info(f"Button {btn_data} retry click success")
         except errors.BotResponseTimeoutError:
             # Кнопка не прожалась, возможно придется пробовать еще
-            logger.warning(f"Button {['last_button'][1]} answer timeout")
+            logger.warning(f"Button {btn_data} answer timeout")
         except errors.MessageIdInvalidError:
             global_state['last_button'] = None
-            logger.warning(f"Message with {['last_button'][1]} was deleted while retry click")
+            logger.warning(f"Message with {btn_data} was deleted while click retry")
 
 
 # Load submodules and activate them

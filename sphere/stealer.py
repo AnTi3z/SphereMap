@@ -57,9 +57,9 @@ async def ready_handler(event):
 @events.register(events.NewMessage(chats=(BOT_ID,), pattern=_steal_re))
 async def steal_handler(event):
     btn = event.message.buttons[0][1]
-    logger.debug(f"New steal message with button: {btn.data.decode('utf-8')}")
+    logger.debug(f"New steal message with button: {btn.data.decode()}")
     if global_state['task'] == Task.STEALING:
-        logger.info(f"Click button: {btn.data.decode('utf-8')}")
+        logger.info(f"Click button: {btn.data.decode()}")
         await btn.click()
 
         steal_timer.set(1800)  # half hours

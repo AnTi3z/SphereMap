@@ -54,16 +54,16 @@ def generate_dst():
             return dst
 
 
-async def try_click(msg, data):
+async def try_click(button):
     time.sleep(random.uniform(1.1, 2.5))
-    global_state['last_button'] = (msg.id, data)
+    global_state['last_button'] = button
     try:
-        await msg.click(data=data.encode('utf-8'))
+        await button.click()
         global_state['last_button'] = None
     except errors.BotResponseTimeoutError:
-        logger.warning(f"Button {data} answer timeout")
+        logger.warning(f"Button {button.data.decode()} answer timeout")
     except errors.MessageIdInvalidError:
-        logger.warning(f"Message with {data} was deleted")
+        logger.warning(f"Message with {button.data.decode()} was deleted")
 
 
 _heal_re = r"Твоё ❤️ здоровье и 🛡 щит полностью восстановились!"
@@ -86,17 +86,17 @@ async def town_handler(event):
     global cur_room
     global dst_room
 
-    # Загружаем кнопки в список
-    btn_data = [btn.data.decode('utf-8') for btn in itertools.chain.from_iterable(event.message.buttons)]
+    # Загружаем кнопки в словарь {button_data: button}
+    buttons = {btn.data.decode(): btn for btn in itertools.chain.from_iterable(event.message.buttons)}
 
     # Если включена тренировка, и мы у тренера - жмём её
-    if 'cwa_training' in btn_data and WALKER_CFG['training']:
-        await try_click(event.message, 'cwa_training')
+    if 'cwa_training' in buttons.keys() and WALKER_CFG['training']:
+        await try_click(buttons['cwa_training'])
         return
 
     # Если нарвались на торговца, телепорт и т.п. жмем "Уйти"
-    if 'cwa_nothing' in btn_data:
-        await try_click(event.message, 'cwa_nothing')
+    if 'cwa_nothing' in buttons.keys():
+        await try_click(buttons['cwa_nothing'])
         return
 
     # Проверяем текущее задание и настройку автогуляния
@@ -108,7 +108,7 @@ async def town_handler(event):
     # Если текущее задание не гулять - возвращаемся в бараки
     if global_state['task'] not in (Task.WALKING, Task.NONE):
         time.sleep(random.uniform(1.1, 2.5))
-        await try_click(event.message, 'cwgoto_-1_-1')
+        await try_click(buttons['cwgoto_-1_-1'])
         return
 
     # Координаты текущей комнаты
@@ -139,9 +139,9 @@ async def town_handler(event):
         next_btn_data = f"cwgoto_{next_room[0]}_{next_room[1]}"
 
         # Если такая кнопка есть в списке - давим ее
-        if next_btn_data in btn_data:
+        if next_btn_data in buttons.keys():
             time.sleep(random.uniform(0.2, 2.0))
-            await try_click(event.message, next_btn_data)
+            await try_click(buttons[next_btn_data])
 
 
 def activate(client, walker_cfg):
