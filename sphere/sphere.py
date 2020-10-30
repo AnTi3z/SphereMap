@@ -1,10 +1,10 @@
 import asyncio
 import logging
 from enum import Enum
-from typing import TypedDict, Optional, Final
+# from typing import TypedDict, Optional, Final
 
 from telethon import events, errors, TelegramClient
-from telethon.tl.custom import MessageButton
+# from telethon.tl.custom import MessageButton
 
 from modules import Modules
 
@@ -17,15 +17,16 @@ class Task(Enum):
     STEALING = 2
 
 
-class State(TypedDict):
-    task: Optional[Task]
-    last_button: Optional[MessageButton]
+# class State(TypedDict):
+#     task: Optional[Task]
+#     last_button: Optional[MessageButton]
 
 
-BOT_ID: Final = 944268265
+# Global vars
+BOT_ID = 944268265
 submodules: Modules
 client: TelegramClient
-global_state: State = {'task': None, 'last_button': None}
+global_state = {'task': None, 'last_button': None}
 
 
 # Не сработала кнопка
