@@ -50,15 +50,15 @@ _wait_re = r"(?s)^Тебе пока рано снова воровать.+Чер
 async def ready_handler(event):
     if global_state['task'] == Task.STEALING:
         time.sleep(random.uniform(1.1, 2.5))
-        await event.message.respond("🔮 Сфериум")
+        await event.respond("🔮 Сфериум")
         time.sleep(random.uniform(1.1, 2.5))
-        await event.message.respond("🦹🏼‍♂️ Воровство")
+        await event.respond("🦹🏼‍♂️ Воровство")
 
 
 @events.register(events.MessageEdited(chats=(BOT_ID,), pattern=_steal_re))
 @events.register(events.NewMessage(chats=(BOT_ID,), pattern=_steal_re))
 async def steal_handler(event):
-    btn = event.message.buttons[0][1]
+    btn = event.buttons[0][1]
     logger.debug(f"New steal message with button: {btn.data.decode()}")
     if global_state['task'] == Task.STEALING:
         logger.info(f"Click button: {btn.data.decode()}")
@@ -68,9 +68,9 @@ async def steal_handler(event):
 
         await asyncio.sleep(random.uniform(200, 250))  # Gap fo fighting
         time.sleep(random.uniform(1.1, 2.5))
-        await event.message.respond("🔮 Сфериум")
+        await event.respond("🔮 Сфериум")
         time.sleep(random.uniform(1.1, 2.5))
-        await event.message.respond("🏡 Прогулка по городу")
+        await event.respond("🏡 Прогулка по городу")
 
 
 @events.register(events.MessageEdited(chats=(BOT_ID,), pattern=_wait_re))

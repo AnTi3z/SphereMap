@@ -14,7 +14,7 @@ client: TelegramClient
 @events.register(events.NewMessage(chats=(BOT_ID,), pattern=r"(?s).+Копать еще:", incoming=True))
 async def digging(event):
     time.sleep(random.uniform(10, 100))
-    await event.message.respond(r"/dig")
+    await event.respond(r"/dig")
 
 
 def activate(cli, _):

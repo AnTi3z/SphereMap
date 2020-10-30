@@ -75,9 +75,9 @@ _town_re = r"(?s)^Ты находишься на 🏡(.+?) (\d+)\s+(.+)"
 async def auto_return(event):
     if WALKER_CFG['auto_return']:
         time.sleep(random.uniform(1.1, 2.5))
-        await event.message.respond("🔮 Сфериум")
+        await event.respond("🔮 Сфериум")
         time.sleep(random.uniform(1.1, 2.5))
-        await event.message.respond("🏡 Прогулка по городу")
+        await event.respond("🏡 Прогулка по городу")
 
 
 @events.register(events.MessageEdited(chats=(BOT_ID,), pattern=_town_re))
@@ -86,7 +86,7 @@ async def town_handler(event):
     global dst_room
 
     # Загружаем кнопки в словарь {button_data: button}
-    buttons = {btn.data.decode(): btn for btn in itertools.chain.from_iterable(event.message.buttons)}
+    buttons = {btn.data.decode(): btn for btn in itertools.chain.from_iterable(event.buttons)}
 
     # Если включена тренировка, и мы у тренера - жмём её
     if 'cwa_training' in buttons.keys() and WALKER_CFG['training']:
