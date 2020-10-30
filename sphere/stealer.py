@@ -21,7 +21,7 @@ class StealTimer:
         self._task = None
 
     @staticmethod
-    def set_steal():
+    def _set_steal():
         global_state['task'] = Task.STEALING
         logger.info("It's steal time!")
 
@@ -30,11 +30,11 @@ class StealTimer:
             self._task.cancel()
             logger.debug(f"Steal timer stopped: {self._task}")
 
-    def set(self, delay):
+    def start(self, delay):
         self.stop()
         global_state['task'] = None
         delay_gap = delay + 15
-        self._task = asyncio.get_event_loop().call_later(delay_gap, self.set_steal)
+        self._task = asyncio.get_event_loop().call_later(delay_gap, self._set_steal)
         logger.info(f"Steal timer started for {delay_gap} sec")
 
 
@@ -64,7 +64,7 @@ async def steal_handler(event):
         logger.info(f"Click button: {btn.data.decode()}")
         await btn.click()
 
-        steal_timer.set(1800)  # half hours
+        steal_timer.start(1800)  # half hours
 
         await asyncio.sleep(random.uniform(200, 250))  # Gap fo fighting
         time.sleep(random.uniform(1.1, 2.5))
@@ -84,7 +84,7 @@ async def wait_handler(event):
     if event.pattern_match.group(3):
         time_remain += int(event.pattern_match.group(3))  # seconds
 
-    steal_timer.set(1800)
+    steal_timer.start(1800)
 
 
 _steal_money_re = r"(?s)^Ты выкрал из кошелька бедолаги 💰(\d+)!$"
