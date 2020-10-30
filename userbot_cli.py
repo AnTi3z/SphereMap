@@ -12,8 +12,9 @@ logging.basicConfig(
 logger = logging.getLogger('UserbotCli')
 logger.setLevel(logging.DEBUG)
 
-# modules: Modules
-# client: TelegramClient
+# Global vars
+client: TelegramClient
+modules: Modules
 
 
 def load_module(name):
@@ -33,10 +34,12 @@ async def load(event):
 
 
 if __name__ == "__main__":
+    # Telegram connect
     api = config.load_config('api')
     client = TelegramClient('AnTi3z', api['id'], api['hash'])
     client.start()
 
+    # Load script modules
     modules = Modules(config.load_config())
     for module_name in modules.list_modules():
         load_module(module_name)

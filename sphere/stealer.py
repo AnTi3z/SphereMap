@@ -11,6 +11,7 @@ from .sphere import BOT_ID, global_state, Task
 logger = logging.getLogger('Sphere.stealer')
 logger.setLevel(logging.INFO)
 
+# Global vars
 client: TelegramClient
 
 STEALER_CFG = {}

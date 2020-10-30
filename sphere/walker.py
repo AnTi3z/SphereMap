@@ -13,6 +13,7 @@ from .sphere import BOT_ID, global_state, Task
 logger = logging.getLogger('Sphere.walker')
 logger.setLevel(logging.INFO)
 
+# Global vars
 nx_map = nx.Graph()
 dst_room = None
 client: TelegramClient
