@@ -11,8 +11,11 @@
       "auto_return": true
     },
     "stealer": {
-      "enabled": true,
+      "enabled": false,
       "attempts": 4
+    },
+    "builder": {
+      "enabled": true
     },
     "mapper": {
       "enabled": false
