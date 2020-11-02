@@ -1,5 +1,6 @@
 import logging
 import re
+import itertools
 
 from telethon import events, TelegramClient
 
@@ -67,19 +68,18 @@ async def town_handler(event):
             "exits": list()}
     if bandit_flag:
         room["desc"] = "Тебе удалось одолеть городского"
-    for row in event.message.buttons:
-        for btn in row:
-            txt = re.search(r"(?s)🏡 (\d+) (.+)", btn.text)
-            data = re.search(r"cwgoto_(\d+)_(\d+)", btn.data.decode('utf-8'))
-            if txt and data:
-                room["exits"].append({
-                    "street": txt.group(2).replace("\n", " "),
-                    "num": int(txt.group(1)),
-                    "x": int(data.group(1)),
-                    "y": int(data.group(2))
-                })
-    date = event.message.edit_date or event.message.date
-    db_room_parse(room, event.message.to_id.user_id, date, entry_flag)
+    for btn in itertools.chain.from_iterable(event.buttons):
+        txt = re.search(r"(?s)🏡 (\d+) (.+)", btn.text)
+        data = btn.data.decode().split('_')
+        if txt and data[0] == "cwgoto":
+            room["exits"].append({
+                "street": txt.group(2).replace("\n", " "),
+                "num": int(txt.group(1)),
+                "x": int(data[1]),
+                "y": int(data[2])
+            })
+    date = event.edit_date or event.date
+    db_room_parse(room, event.to_id.user_id, date, entry_flag)
     await event.client.inline_query('SpheriumMapperBot', "new_map_event")
 
 
