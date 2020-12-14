@@ -3,7 +3,7 @@ import logging
 from telethon import TelegramClient, events
 
 import config
-from modules import Modules
+from modules import Module
 
 logging.basicConfig(
     format='[%(asctime)s.%(msecs)d] %(levelname)s:%(name)s:%(funcName)s [lineno %(lineno)d] %(message)s',
@@ -14,7 +14,6 @@ logger.setLevel(logging.DEBUG)
 
 # Global vars
 client: TelegramClient
-modules: Modules
 
 
 def load_module(name):
@@ -40,9 +39,7 @@ if __name__ == "__main__":
     client.start()
 
     # Load script modules
-    modules = Modules(config.load_config())
-    for module_name in modules.list_modules():
-        load_module(module_name)
+    modules = Module.load_modules(client)
 
     client.add_event_handler(load)
     client.run_until_disconnected()

@@ -2,14 +2,12 @@ import logging
 import random
 import time
 
-from telethon import events, TelegramClient
-
+from telethon import events
 
 logger = logging.getLogger('Krapiva')
 logger.setLevel(logging.INFO)
 
 BOT_ID = 1196311609
-client: TelegramClient
 
 
 # КРАПИВАААААААААААААА
@@ -21,14 +19,12 @@ async def krapiva(event):
 
 
 # There is no submodules, activate this script with no config
-def activate(cli, _):
-    global client
-    client = cli
-    client.add_event_handler(krapiva)
+def activate():
     logger.info("Krapiva script activated")
 
 
 def deactivate():
-    if client:
-        client.remove_event_handler(krapiva)
-        logger.info("Krapiva script deactivated")
+    logger.info("Krapiva script deactivated")
+
+
+HANDLERS = (krapiva,)

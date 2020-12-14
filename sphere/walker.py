@@ -4,11 +4,10 @@ import time
 import itertools
 
 import networkx as nx
-from telethon import events, errors, TelegramClient
+from telethon import events, errors
 
 from .db_models import *
 from .sphere import BOT_ID, global_state, Task
-
 
 logger = logging.getLogger('Sphere.walker')
 logger.setLevel(logging.INFO)
@@ -16,18 +15,17 @@ logger.setLevel(logging.INFO)
 # Global vars
 nx_map = nx.Graph()
 dst_room = None
-client: TelegramClient
 
-WALKER_CFG = {}
+MODULE_CFG = {}
 
 
 def load_graph(graph, w1=1.0, w2=1.0):
     filtered_types = (4, 7)
     for passage in (PassagesView
-                    .select(PassagesView.start_x, PassagesView.start_y, PassagesView.start_type,
-                            PassagesView.end_x, PassagesView.end_y, PassagesView.end_type)
-                    .where(PassagesView.start_type.not_in(filtered_types))
-                    .where(PassagesView.end_type.not_in(filtered_types))):
+            .select(PassagesView.start_x, PassagesView.start_y, PassagesView.start_type,
+                    PassagesView.end_x, PassagesView.end_y, PassagesView.end_type)
+            .where(PassagesView.start_type.not_in(filtered_types))
+            .where(PassagesView.end_type.not_in(filtered_types))):
 
         start_room = (passage.start_x, passage.start_y)
         end_room = (passage.end_x, passage.end_y)
@@ -74,7 +72,7 @@ _town_re = r"(?s)^Ты находишься на 🏡(.+?) (\d+)\s+(.+)"
 # Возвращалка в город
 @events.register(events.NewMessage(chats=(BOT_ID,), pattern=_heal_re))
 async def auto_return(event):
-    if WALKER_CFG['auto_return']:
+    if MODULE_CFG['auto_return']:
         time.sleep(random.uniform(1.1, 2.5))
         await event.respond("🔮 Сфериум")
         time.sleep(random.uniform(1.1, 2.5))
@@ -90,7 +88,7 @@ async def town_handler(event):
     buttons = {btn.data.decode(): btn for btn in itertools.chain.from_iterable(event.buttons)}
 
     # Если включена тренировка, и мы у тренера - жмём её
-    if 'cwa_training' in buttons.keys() and WALKER_CFG['training']:
+    if 'cwa_training' in buttons.keys() and MODULE_CFG['training']:
         await try_click(buttons['cwa_training'])
         return
 
@@ -142,19 +140,13 @@ async def town_handler(event):
             await try_click(buttons[next_btn_data])
 
 
-def activate(cli, cfg):
-    global client
-    global WALKER_CFG
-    client = cli
-    WALKER_CFG = cfg
+def activate():
     load_graph(nx_map, 0.1, 0.01)
-    client.add_event_handler(town_handler)
-    client.add_event_handler(auto_return)
-    logger.info("Walker script activated")
+    logger.info("Sphere.Walker script activated")
 
 
 def deactivate():
-    if client:
-        client.remove_event_handler(town_handler)
-        client.remove_event_handler(auto_return)
-        logger.info("Walker script deactivated")
+    logger.info("Sphere.Walker script deactivated")
+
+
+HANDLERS = (town_handler, auto_return)

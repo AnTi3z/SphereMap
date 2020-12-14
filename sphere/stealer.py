@@ -3,18 +3,14 @@ import logging
 import random
 import time
 
-from telethon import events, TelegramClient
+from telethon import events
 
 from .sphere import BOT_ID, global_state, Task
-
 
 logger = logging.getLogger('Sphere.stealer')
 logger.setLevel(logging.INFO)
 
-# Global vars
-client: TelegramClient
-
-STEALER_CFG = {}
+MODULE_CFG = {}
 
 
 class StealTimer:
@@ -126,27 +122,14 @@ async def steal6_handler(event):
     logger.info(f"Failed steal(stone)")
 
 
-def activate(cli, cfg):
-    global client
-    global STEALER_CFG
-    client = cli
-    STEALER_CFG = cfg
-    client.add_event_handler(ready_handler)
-    client.add_event_handler(steal_handler)
-    client.add_event_handler(wait_handler)
-    client.add_event_handler(steal1_handler)
-    client.add_event_handler(steal2_handler)
-    client.add_event_handler(steal3_handler)
-    client.add_event_handler(steal4_handler)
-    client.add_event_handler(steal5_handler)
-    client.add_event_handler(steal6_handler)
-    logger.info("Stealer script activated")
-    print(f"DEBUG!!! {events.list(ready_handler)}")
+def activate():
+    logger.info("Sphere.Stealer script activated")
 
 
 def deactivate():
-    if client:
-        client.remove_event_handler(ready_handler)
-        client.remove_event_handler(steal_handler)
-        client.remove_event_handler(wait_handler)
-        logger.info("Stealer script deactivated")
+    logger.info("Sphere.Stealer script deactivated")
+
+
+HANDLERS = (ready_handler, steal_handler, wait_handler,
+            steal1_handler, steal2_handler, steal3_handler,
+            steal4_handler, steal5_handler, steal6_handler)

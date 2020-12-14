@@ -3,10 +3,10 @@ import logging
 from enum import Enum
 # from typing import TypedDict, Optional, Final
 
-from telethon import events, errors, TelegramClient
+from telethon import events, errors
+
 # from telethon.tl.custom import MessageButton
 
-from modules import Modules
 
 logger = logging.getLogger('Sphere')
 logger.setLevel(logging.INFO)
@@ -24,8 +24,6 @@ class Task(Enum):
 
 # Global vars
 BOT_ID = 944268265
-submodules: Modules
-client: TelegramClient
 global_state = {'task': None, 'last_button': None}
 
 
@@ -51,19 +49,12 @@ async def retry(event):
 
 
 # Load submodules and activate them
-def activate(cli, cfg):
-    global client
-    global submodules
-    client = cli
-    submodules = Modules(cfg)
-    for module_name in submodules.list_modules():
-        module = submodules.load_module("sphere", module_name)
-        module_cfg = cfg['modules'][module_name]
-        if module and module_cfg['enabled']:
-            module.activate(client, module_cfg)
+def activate():
+    logger.info("Sphere script activated")
 
 
 def deactivate():
-    if submodules:
-        for module in submodules.loaded_modules.values():
-            module.deactivate()
+    logger.info("Sphere script deactivated")
+
+
+HANDLERS = (retry,)
