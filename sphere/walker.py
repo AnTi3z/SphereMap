@@ -4,10 +4,10 @@ import time
 import itertools
 
 import networkx as nx
-from telethon import events, errors
+from telethon import events
 
 from .db_models import *
-from .sphere import BOT_ID, global_state, Task
+from .sphere import BOT_ID, global_state, try_click, Task
 
 logger = logging.getLogger('Sphere.walker')
 logger.setLevel(logging.INFO)
@@ -51,18 +51,6 @@ def generate_dst(src):
         # Проверяем построение маршрута
         if nx.has_path(nx_map, src, dst):
             return dst
-
-
-async def try_click(button):
-    time.sleep(random.uniform(1.1, 2.5))
-    global_state['last_button'] = button
-    try:
-        await button.click()
-        global_state['last_button'] = None
-    except errors.BotResponseTimeoutError:
-        logger.warning(f"Button {button.data.decode()} answer timeout")
-    except errors.MessageIdInvalidError:
-        logger.warning(f"Message with {button.data.decode()} was deleted")
 
 
 _heal_re = r"Твоё ❤️ здоровье и 🛡 щит полностью восстановились!"

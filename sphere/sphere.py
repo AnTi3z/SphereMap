@@ -1,5 +1,7 @@
 import asyncio
 import logging
+import random
+import time
 from enum import Enum
 # from typing import TypedDict, Optional, Final
 
@@ -25,6 +27,18 @@ class Task(Enum):
 # Global vars
 BOT_ID = 944268265
 global_state = {'task': None, 'last_button': None}
+
+
+async def try_click(button):
+    time.sleep(random.uniform(1.1, 2.5))
+    global_state['last_button'] = button
+    try:
+        await button.click()
+        global_state['last_button'] = None
+    except errors.BotResponseTimeoutError:
+        logger.warning(f"Button {button.data.decode()} answer timeout")
+    except errors.MessageIdInvalidError:
+        logger.warning(f"Message with {button.data.decode()} was deleted")
 
 
 # Не сработала кнопка
