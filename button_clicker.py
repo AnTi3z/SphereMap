@@ -1,8 +1,10 @@
 import time
 import random
 import logging
+from typing import Optional
 
 from telethon import errors
+from telethon.tl.custom.messagebutton import MessageButton
 
 logger = logging.getLogger('ButtonClicker')
 logger.setLevel(logging.INFO)
@@ -21,7 +23,7 @@ class ButtonClicker:
         self._last_button = None
 
     @staticmethod
-    def find_button(msg, i=None, j=None, *, text=None, filter=None, data=None):
+    def find_button(msg, i=None, j=None, *, text=None, filter=None, data=None) -> Optional[MessageButton]:
         # See telethon.tl.custom.message.Message.click:
         # https://docs.telethon.dev/en/latest/modules/custom.html#telethon.tl.custom.message.Message.click
 
@@ -59,13 +61,15 @@ class ButtonClicker:
             return msg.buttons[i][j]
 
     async def click_cb_data(self, msg, data):
-        btn = self.find_button(msg, data=data)
-        if btn:
-            await self.click(btn)
+        button = self.find_button(msg, data=data)
+        if button:
+            await self.click(button)
 
-    async def click(self, button):
+    async def click(self, button: MessageButton):
+        if not button:
+            return
+
         self._last_button = button
-
         time.sleep(random.uniform(1.1, 2.5))
         btn_data = self._last_button.data.decode()
         try:
