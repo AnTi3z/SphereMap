@@ -1,11 +1,11 @@
 import logging
 import random
 import time
-import itertools
 
 from telethon import events
 
-from .sphere import BOT_ID, try_click
+from .sphere import BOT_ID
+from button_clicker import ButtonClicker
 
 logger = logging.getLogger('Sphere.builder')
 logger.setLevel(logging.INFO)
@@ -24,10 +24,10 @@ async def go_to_buildings(event):
 
 @events.register(events.NewMessage(chats=(BOT_ID,), pattern=_buildings_re))
 async def start_build(event):
-    time.sleep(random.uniform(1.1, 2.5))
-    for btn in itertools.chain.from_iterable(event.buttons):
-        if btn.data.decode() == 'frabuildbuild':
-            await try_click(btn)
+    clicker = ButtonClicker.get_clicker(BOT_ID)
+    button = clicker.find_button(event, 'frabuildbuild')
+    if button:
+        await clicker.click(button)
 
 
 def activate():

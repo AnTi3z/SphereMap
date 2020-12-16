@@ -7,7 +7,8 @@ import networkx as nx
 from telethon import events
 
 from .db_models import *
-from .sphere import BOT_ID, global_state, try_click, Task
+from .sphere import BOT_ID, global_state, Task
+from button_clicker import ButtonClicker
 
 logger = logging.getLogger('Sphere.walker')
 logger.setLevel(logging.INFO)
@@ -15,6 +16,7 @@ logger.setLevel(logging.INFO)
 # Global vars
 nx_map = nx.Graph()
 dst_room = None
+clicker = ButtonClicker.get_clicker(BOT_ID)
 
 MODULE_CFG = {}
 
@@ -73,16 +75,18 @@ async def town_handler(event):
     global dst_room
 
     # Загружаем кнопки в словарь {button_data: button}
-    buttons = {btn.data.decode(): btn for btn in itertools.chain.from_iterable(event.buttons)}
+    # buttons = {btn.data.decode(): btn for btn in itertools.chain.from_iterable(event.buttons)}
 
     # Если включена тренировка, и мы у тренера - жмём её
-    if 'cwa_training' in buttons.keys() and MODULE_CFG['training']:
-        await try_click(buttons['cwa_training'])
+    button = clicker.find_button(event, data='cwa_training')
+    if button and MODULE_CFG['training']:
+        await clicker.click(button)
         return
 
     # Если нарвались на торговца, телепорт и т.п. жмем "Уйти"
-    if 'cwa_nothing' in buttons.keys():
-        await try_click(buttons['cwa_nothing'])
+    button = clicker.find_button(event, data='cwa_nothing')
+    if button:
+        await clicker.click(button)
         return
 
     # Если нет других заданий - включаем автогуляние
@@ -91,8 +95,7 @@ async def town_handler(event):
 
     # Если текущее задание не гулять - возвращаемся в бараки
     if global_state['task'] != Task.WALKING:
-        time.sleep(random.uniform(1.1, 2.5))
-        await try_click(buttons['cwgoto_-1_-1'])
+        await clicker.click_cb_data(event, 'cwgoto_-1_-1')
         return
 
     # Координаты текущей комнаты
@@ -123,9 +126,9 @@ async def town_handler(event):
         next_btn_data = f"cwgoto_{next_room[0]}_{next_room[1]}"
 
         # Если такая кнопка есть в списке - давим ее
-        if next_btn_data in buttons.keys():
-            time.sleep(random.uniform(0.2, 2.0))
-            await try_click(buttons[next_btn_data])
+        button = clicker.find_button(event, data=next_btn_data)
+        if button:
+            await clicker.click(button)
 
 
 def activate():
