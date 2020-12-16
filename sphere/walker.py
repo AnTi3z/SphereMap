@@ -1,7 +1,6 @@
 import logging
 import random
 import time
-import itertools
 
 import networkx as nx
 from telethon import events
@@ -23,10 +22,10 @@ MODULE_CFG = {}
 def load_graph(graph, w1=1.0, w2=1.0):
     filtered_types = (4, 7)
     for passage in (PassagesView
-            .select(PassagesView.start_x, PassagesView.start_y, PassagesView.start_type,
-                    PassagesView.end_x, PassagesView.end_y, PassagesView.end_type)
-            .where(PassagesView.start_type.not_in(filtered_types))
-            .where(PassagesView.end_type.not_in(filtered_types))):
+                    .select(PassagesView.start_x, PassagesView.start_y, PassagesView.start_type,
+                            PassagesView.end_x, PassagesView.end_y, PassagesView.end_type)
+                    .where(PassagesView.start_type.not_in(filtered_types))
+                    .where(PassagesView.end_type.not_in(filtered_types))):
 
         start_room = (passage.start_x, passage.start_y)
         end_room = (passage.end_x, passage.end_y)
