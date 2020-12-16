@@ -123,9 +123,7 @@ async def town_handler(event):
         next_btn_data = f"cwgoto_{next_room[0]}_{next_room[1]}"
 
         # Если такая кнопка есть в списке - давим ее
-        button = clicker.find_button(event, data=next_btn_data)
-        if button:
-            await clicker.click(button)
+        await clicker.click_cb_data(event, next_btn_data)
 
 
 def activate():

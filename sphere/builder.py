@@ -24,10 +24,7 @@ async def go_to_buildings(event):
 
 @events.register(events.NewMessage(chats=(BOT_ID,), pattern=_buildings_re))
 async def start_build(event):
-    clicker = ButtonClicker.get_clicker(BOT_ID)
-    button = clicker.find_button(event, 'frabuildbuild')
-    if button:
-        await clicker.click(button)
+    await ButtonClicker.get_clicker(BOT_ID).click_cb_data(event, 'frabuildbuild')
 
 
 def activate():
