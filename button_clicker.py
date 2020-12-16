@@ -29,9 +29,11 @@ class ButtonClicker:
 
         buttons_flat = [x for row in msg.buttons for x in row]
 
-        for button in buttons_flat:
-            if button.data.decode() == data:
-                return button
+        if data is not None:
+            for button in buttons_flat:
+                if button.data.decode() == data:
+                    return button
+            return None
 
         if sum(int(x is not None) for x in (i, text, filter)) >= 2:
             raise ValueError('You can only set either of i, text or filter')
@@ -54,7 +56,7 @@ class ButtonClicker:
             return
 
         if i is None:
-            i = 0
+            return None
         if j is None:
             return buttons_flat[i]
         else:
@@ -75,7 +77,7 @@ class ButtonClicker:
         try:
             await self._last_button.click()
             self._last_button = None
-            logger.info(f"Button {btn_data} click success")
+            logger.debug(f"Button {btn_data} click success")
         except errors.BotResponseTimeoutError:
             logger.warning(f"Button {btn_data} answer timeout")
         except errors.MessageIdInvalidError:
