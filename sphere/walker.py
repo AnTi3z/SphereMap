@@ -16,7 +16,6 @@ logger.setLevel(logging.INFO)
 # Global vars
 nx_map = nx.Graph()
 dst_room = None
-clicker = ButtonClicker.get_clicker(BOT_ID)
 
 MODULE_CFG = {}
 
@@ -73,9 +72,7 @@ async def auto_return(event):
 @events.register(events.NewMessage(chats=(BOT_ID,), pattern=_town_re))
 async def town_handler(event):
     global dst_room
-
-    # Загружаем кнопки в словарь {button_data: button}
-    # buttons = {btn.data.decode(): btn for btn in itertools.chain.from_iterable(event.buttons)}
+    clicker = ButtonClicker.get_clicker(BOT_ID)
 
     # Если включена тренировка, и мы у тренера - жмём её
     button = clicker.find_button(event, data='cwa_training')
