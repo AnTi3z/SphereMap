@@ -65,11 +65,6 @@ class ButtonClicker:
 
     async def click(self, button):
         self._last_button = button
-        await self.reclick()
-
-    async def reclick(self):
-        if not self._last_button:
-            return
 
         time.sleep(random.uniform(1.1, 2.5))
         btn_data = self._last_button.data.decode()
@@ -82,3 +77,9 @@ class ButtonClicker:
         except errors.MessageIdInvalidError:
             self._last_button = None
             logger.warning(f"Message with {btn_data} was deleted")
+
+    async def reclick(self):
+        if self._last_button:
+            logger.info(f"Retry {self._last_button.data.decode()} click")
+            await self.click(self._last_button)
+
