@@ -17,6 +17,10 @@
     "builder": {
       "enabled": true
     },
+    "combiner": {
+      "enabled": true,
+      "level": 5
+    },
     "mapper": {
       "enabled": false
     }
