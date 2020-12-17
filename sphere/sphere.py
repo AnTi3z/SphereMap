@@ -1,7 +1,7 @@
 import asyncio
 import logging
 from enum import Enum
-# from typing import TypedDict, Optional, Final
+# from typing import Optional
 
 from telethon import events
 
@@ -17,8 +17,9 @@ class Task(Enum):
     STEALING = 2
 
 
-# class State(TypedDict):
-#     task: Optional[Task]
+# class State:
+#     def __init__(self):
+#         self.task: Optional[Task] = None
 
 
 # Global vars
