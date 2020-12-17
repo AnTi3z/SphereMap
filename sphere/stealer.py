@@ -19,7 +19,7 @@ class StealTimer:
 
     @staticmethod
     def _set_steal():
-        global_state['task'] = Task.STEALING
+        global_state.task = Task.STEALING
         logger.info("It's steal time!")
 
     def stop(self):
@@ -29,7 +29,7 @@ class StealTimer:
 
     def start(self, delay):
         self.stop()
-        global_state['task'] = None
+        global_state.task = Task.NONE
         delay_gap = delay + 15
         self._task = asyncio.get_event_loop().call_later(delay_gap, self._set_steal)
         logger.info(f"Steal timer started for {delay_gap} sec")
@@ -45,7 +45,7 @@ _wait_re = r"(?s)^Тебе пока рано искать жертву.+Чере
 @events.register(events.MessageEdited(chats=(BOT_ID,), pattern=_ready_re))
 @events.register(events.NewMessage(chats=(BOT_ID,), pattern=_ready_re))
 async def ready_handler(event):
-    if global_state['task'] == Task.STEALING:
+    if global_state.task == Task.STEALING:
         time.sleep(random.uniform(1.1, 2.5))
         await event.respond("🔮 Сфериум")
         time.sleep(random.uniform(1.1, 2.5))
@@ -57,7 +57,7 @@ async def ready_handler(event):
 async def steal_handler(event):
     btn = event.buttons[0][1]
     logger.debug(f"New steal message with button: {btn.data.decode()}")
-    if global_state['task'] == Task.STEALING:
+    if global_state.task == Task.STEALING:
         logger.info(f"Click button: {btn.data.decode()}")
         await btn.click()
 

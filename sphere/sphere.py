@@ -1,7 +1,6 @@
 import asyncio
 import logging
 from enum import Enum
-# from typing import Optional
 
 from telethon import events
 
@@ -13,18 +12,22 @@ logger.setLevel(logging.INFO)
 
 
 class Task(Enum):
-    WALKING = 1
-    STEALING = 2
+    NONE = 1
+    WALKING = 2
+    STEALING = 3
 
 
-# class State:
-#     def __init__(self):
-#         self.task: Optional[Task] = None
+class State:
+    def __init__(self):
+        self.task = Task.NONE
+
+    def have_task(self):
+        return self.task != Task.NONE
 
 
 # Global vars
 BOT_ID = 944268265
-global_state = {'task': None}
+global_state = State()
 
 
 # Не сработала кнопка

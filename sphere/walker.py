@@ -86,11 +86,11 @@ async def town_handler(event):
         return
 
     # Если нет других заданий - включаем автогуляние
-    if not global_state['task']:
-        global_state['task'] = Task.WALKING
+    if not global_state.have_task():
+        global_state.task = Task.WALKING
 
     # Если текущее задание не гулять - возвращаемся в бараки
-    if global_state['task'] != Task.WALKING:
+    if global_state.task != Task.WALKING:
         await clicker.click_cb_data(event, 'cwgoto_-1_-1')
         return
 
