@@ -11,8 +11,7 @@
       "auto_return": true
     },
     "stealer": {
-      "enabled": false,
-      "attempts": 4
+      "enabled": true
     },
     "builder": {
       "enabled": true
