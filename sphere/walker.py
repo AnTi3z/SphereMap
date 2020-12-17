@@ -1,13 +1,13 @@
 import logging
 import random
 import time
-import itertools
 
 import networkx as nx
 from telethon import events
 
 from .db_models import *
-from .sphere import BOT_ID, global_state, try_click, Task
+from .sphere import BOT_ID, global_state, Task
+from button_clicker import ButtonClicker
 
 logger = logging.getLogger('Sphere.walker')
 logger.setLevel(logging.INFO)
@@ -22,10 +22,10 @@ MODULE_CFG = {}
 def load_graph(graph, w1=1.0, w2=1.0):
     filtered_types = (4, 7)
     for passage in (PassagesView
-            .select(PassagesView.start_x, PassagesView.start_y, PassagesView.start_type,
-                    PassagesView.end_x, PassagesView.end_y, PassagesView.end_type)
-            .where(PassagesView.start_type.not_in(filtered_types))
-            .where(PassagesView.end_type.not_in(filtered_types))):
+                    .select(PassagesView.start_x, PassagesView.start_y, PassagesView.start_type,
+                            PassagesView.end_x, PassagesView.end_y, PassagesView.end_type)
+                    .where(PassagesView.start_type.not_in(filtered_types))
+                    .where(PassagesView.end_type.not_in(filtered_types))):
 
         start_room = (passage.start_x, passage.start_y)
         end_room = (passage.end_x, passage.end_y)
@@ -71,18 +71,18 @@ async def auto_return(event):
 @events.register(events.NewMessage(chats=(BOT_ID,), pattern=_town_re))
 async def town_handler(event):
     global dst_room
-
-    # Загружаем кнопки в словарь {button_data: button}
-    buttons = {btn.data.decode(): btn for btn in itertools.chain.from_iterable(event.buttons)}
+    clicker = ButtonClicker.get_clicker(BOT_ID)
 
     # Если включена тренировка, и мы у тренера - жмём её
-    if 'cwa_training' in buttons.keys() and MODULE_CFG['training']:
-        await try_click(buttons['cwa_training'])
+    button = clicker.find_button(event, data='cwa_training')
+    if button and MODULE_CFG['training']:
+        await clicker.click(button)
         return
 
     # Если нарвались на торговца, телепорт и т.п. жмем "Уйти"
-    if 'cwa_nothing' in buttons.keys():
-        await try_click(buttons['cwa_nothing'])
+    button = clicker.find_button(event, data='cwa_nothing')
+    if button:
+        await clicker.click(button)
         return
 
     # Если нет других заданий - включаем автогуляние
@@ -91,8 +91,7 @@ async def town_handler(event):
 
     # Если текущее задание не гулять - возвращаемся в бараки
     if global_state['task'] != Task.WALKING:
-        time.sleep(random.uniform(1.1, 2.5))
-        await try_click(buttons['cwgoto_-1_-1'])
+        await clicker.click_cb_data(event, 'cwgoto_-1_-1')
         return
 
     # Координаты текущей комнаты
@@ -123,9 +122,7 @@ async def town_handler(event):
         next_btn_data = f"cwgoto_{next_room[0]}_{next_room[1]}"
 
         # Если такая кнопка есть в списке - давим ее
-        if next_btn_data in buttons.keys():
-            time.sleep(random.uniform(0.2, 2.0))
-            await try_click(buttons[next_btn_data])
+        await clicker.click_cb_data(event, next_btn_data)
 
 
 def activate():
