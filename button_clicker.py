@@ -88,4 +88,3 @@ class ButtonClicker:
         if self._last_button:
             logger.info(f"Retry {self._last_button.data.decode()} click")
             await self.click(self._last_button)
-
