@@ -3,7 +3,7 @@ import logging
 import random
 import time
 from enum import Enum
-# from typing import TypedDict, Optional, Final
+# from typing import Optional
 
 from telethon import events, errors
 
@@ -19,9 +19,9 @@ class Task(Enum):
     STEALING = 2
 
 
-# class State(TypedDict):
-#     task: Optional[Task]
-#     last_button: Optional[MessageButton]
+# class State:
+#     def __init__(self):
+#         self.task: Optional[Task] = None
 
 
 # Global vars
