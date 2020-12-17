@@ -12,14 +12,29 @@ logger.setLevel(logging.DEBUG)
 
 MODULE_CFG = {}
 
-_fight_re = r'🧙🏻‍♂️.+\n❤️\d+.+🛡\d+.+\n\n.+\n❤️\d+.+🛡\d+'
+_fight_re = r'🧙🏻‍♂️.+\n❤️\d+.+🛡\d+.*\n\n.+\n❤️\d+.+🛡\d+'
+
+
+def button_choose(buttons):
+    buttons_flat = [x for row in buttons for x in row if "🕐" not in x.text]
+    if len(buttons_flat) == 1:
+        return buttons_flat[0]
+    else:
+        buttons_flat = buttons_flat[:-1]
+
+    for sphere in MODULE_CFG['build']:
+        for button in buttons_flat:
+            if sphere in button.text:
+                return button
+
+    return buttons_flat[-1]
 
 
 @events.register(events.MessageEdited(chats=(BOT_ID,), pattern=_fight_re))
 @events.register(events.NewMessage(chats=(BOT_ID,), pattern=_fight_re))
 async def fighting(event):
-    buttons_flat = [x for row in event.buttons[1:] for x in row if "🕐" not in x.text][:-1]
-    pass
+    time.sleep(random.uniform(3.0, 7.5))
+    await button_choose(event.buttons[1:]).click()
 
 
 def activate():

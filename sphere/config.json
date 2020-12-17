@@ -21,7 +21,8 @@
       "level": 5
     },
     "fighting": {
-      "enabled": true
+      "enabled": true,
+      "build": ["Курохицуги", "Блейд", "Гияцо", "Кайфат", "Архимонд", "Бальтазар", "Зок", "Кусь"]
     },
     "mapper": {
       "enabled": false
