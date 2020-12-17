@@ -20,6 +20,9 @@
       "enabled": true,
       "level": 5
     },
+    "fighting": {
+      "enabled": true
+    },
     "mapper": {
       "enabled": false
     }
