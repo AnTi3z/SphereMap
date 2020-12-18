@@ -27,6 +27,9 @@ class ButtonClicker:
         # See telethon.tl.custom.message.Message.click:
         # https://docs.telethon.dev/en/latest/modules/custom.html#telethon.tl.custom.message.Message.click
 
+        if msg.buttons is None:
+            return
+
         buttons_flat = [x for row in msg.buttons for x in row]
 
         if data is not None:
