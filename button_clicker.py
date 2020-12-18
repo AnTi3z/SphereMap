@@ -78,14 +78,18 @@ class ButtonClicker:
         time.sleep(random.uniform(1.1, 2.5))
         btn_data = self._last_button.data.decode()
         try:
-            await self._last_button.click()
-            self._last_button = None
-            logger.debug(f"Button {btn_data} click success")
+            result = await self._last_button.click()
+            if result is not None:
+                # self._last_button = None
+                logger.debug(f"Button {btn_data} click success")
         except errors.BotResponseTimeoutError:
             logger.warning(f"Button {btn_data} answer timeout")
         except errors.MessageIdInvalidError:
-            self._last_button = None
+            # self._last_button = None
             logger.warning(f"Message with {btn_data} was deleted")
+        except errors.DataInvalidError:
+            # self._last_button = None
+            logger.warning(f"Where is no button {btn_data}")
 
     async def reclick(self):
         if self._last_button:
