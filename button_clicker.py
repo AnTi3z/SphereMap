@@ -86,6 +86,9 @@ class ButtonClicker:
         except errors.MessageIdInvalidError:
             self._last_button = None
             logger.warning(f"Message with {btn_data} was deleted")
+        except errors.DataInvalidError:
+            self._last_button = None
+            logger.warning(f"Where is no button {btn_data}")
 
     async def reclick(self):
         if self._last_button:
