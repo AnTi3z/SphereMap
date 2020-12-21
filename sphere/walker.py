@@ -62,8 +62,7 @@ _town_re = r"(?s)^Ты находишься на 🏡(.+?) (\d+)\s+(.+)"
 @events.register(events.MessageEdited(chats=(BOT_ID,), pattern=_ready_re))
 @events.register(events.NewMessage(chats=(BOT_ID,), pattern=_ready_re))
 async def ready_handler(event):
-    health = int(event.pattern_match.group(1))
-    if instant_return and health == 100 and global_state.is_no_tasks():
+    if instant_return and event.pattern_match.group(1) == '100' and global_state.is_no_tasks():
         time.sleep(random.uniform(1.1, 2.5))
         await event.respond("🔮 Сфериум")
         time.sleep(random.uniform(1.1, 2.5))

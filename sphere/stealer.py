@@ -6,36 +6,14 @@ import time
 from telethon import events
 
 from .sphere import BOT_ID, global_state, Task
+from timer import Timer
 
 logger = logging.getLogger('Sphere.stealer')
 logger.setLevel(logging.INFO)
 
 MODULE_CFG = {}
 
-
-class StealTimer:
-    def __init__(self):
-        self._task = None
-
-    @staticmethod
-    def _set_steal():
-        global_state.task = Task.STEALING
-        logger.info("It's steal time!")
-
-    def stop(self):
-        if self._task:
-            self._task.cancel()
-            logger.debug(f"Steal timer stopped: {self._task}")
-
-    def start(self, delay):
-        self.stop()
-        global_state.task = Task.NONE
-        delay_gap = delay + 15
-        self._task = asyncio.get_event_loop().call_later(delay_gap, self._set_steal)
-        logger.info(f"Steal timer started for {delay_gap} sec")
-
-
-steal_timer = StealTimer()
+steal_timer = Timer(lambda: setattr(global_state, 'task', Task.STEALING), "StealTimer")
 
 _ready_re = r"(?s)^🧙🏻‍♂️.+❤️\d+.+🛡\d+.+👊"
 _steal_re = r"(?s)^(?:Не найдя ничего лучше)|(?:Поискав подходящий случай)|(?:Побродив в округе)"
@@ -61,13 +39,8 @@ async def steal_handler(event):
         logger.info(f"Click button: {btn.data.decode()}")
         await btn.click()
 
-        steal_timer.start(1800)  # half hours
-
-        # await asyncio.sleep(random.uniform(200, 250))  # Gap fo fighting
-        # time.sleep(random.uniform(1.1, 2.5))
-        # await event.respond("🔮 Сфериум")
-        # time.sleep(random.uniform(1.1, 2.5))
-        # await event.respond("🏡 Прогулка по городу")
+        global_state.task = Task.NONE
+        steal_timer.start(1800+15)  # half hours
 
 
 @events.register(events.MessageEdited(chats=(BOT_ID,), pattern=_wait_re))
@@ -80,8 +53,10 @@ async def wait_handler(event):
         time_remain += int(event.pattern_match.group(2)) * 60  # minutes
     if event.pattern_match.group(3):
         time_remain += int(event.pattern_match.group(3))  # seconds
+    logger.debug(f"Steal search time remain: {time_remain}")
 
-    steal_timer.start(1800)
+    global_state.task = Task.NONE
+    steal_timer.start(time_remain-5400+15)
 
 
 _steal_money_re = r"(?s)^Ты выкрал.+💰(\d+)"
