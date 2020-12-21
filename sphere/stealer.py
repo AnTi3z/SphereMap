@@ -63,11 +63,11 @@ async def steal_handler(event):
 
         steal_timer.start(1800)  # half hours
 
-        await asyncio.sleep(random.uniform(200, 250))  # Gap fo fighting
-        time.sleep(random.uniform(1.1, 2.5))
-        await event.respond("🔮 Сфериум")
-        time.sleep(random.uniform(1.1, 2.5))
-        await event.respond("🏡 Прогулка по городу")
+        # await asyncio.sleep(random.uniform(200, 250))  # Gap fo fighting
+        # time.sleep(random.uniform(1.1, 2.5))
+        # await event.respond("🔮 Сфериум")
+        # time.sleep(random.uniform(1.1, 2.5))
+        # await event.respond("🏡 Прогулка по городу")
 
 
 @events.register(events.MessageEdited(chats=(BOT_ID,), pattern=_wait_re))
@@ -95,16 +95,22 @@ _steal_stone_re = r"(?s)^Кража не удалась.+Защитный кам
 @events.register(events.NewMessage(chats=(BOT_ID,), pattern=_steal_money_re))
 async def steal1_handler(event):
     logger.info(f"Steal money: {event.pattern_match.group(1)}")
+    time.sleep(random.uniform(1.1, 2.5))
+    await event.respond("🏘 Бараки")
 
 
 @events.register(events.NewMessage(chats=(BOT_ID,), pattern=_steal_box_re))
 async def steal2_handler(event):
     logger.info(f"Steal box: {event.pattern_match.group(1)}")
+    time.sleep(random.uniform(1.1, 2.5))
+    await event.respond("🏘 Бараки")
 
 
 @events.register(events.NewMessage(chats=(BOT_ID,), pattern=_steal_item_re))
 async def steal3_handler(event):
     logger.info(f"Steal jackpot: {event.pattern_match.group(1)}")
+    time.sleep(random.uniform(1.1, 2.5))
+    await event.respond("🏘 Бараки")
 
 
 @events.register(events.NewMessage(chats=(BOT_ID,), pattern=_steal_fight_re))
@@ -115,11 +121,15 @@ async def steal4_handler(event):
 @events.register(events.NewMessage(chats=(BOT_ID,), pattern=_steal_empty_re))
 async def steal5_handler(event):
     logger.info(f"Steal with nothing!")
+    time.sleep(random.uniform(1.1, 2.5))
+    await event.respond("🏘 Бараки")
 
 
 @events.register(events.NewMessage(chats=(BOT_ID,), pattern=_steal_stone_re))
 async def steal6_handler(event):
     logger.info(f"Failed steal(stone)")
+    time.sleep(random.uniform(1.1, 2.5))
+    await event.respond("🏘 Бараки")
 
 
 def activate():

@@ -21,8 +21,8 @@ class State:
     def __init__(self):
         self.task = Task.NONE
 
-    def have_task(self):
-        return self.task != Task.NONE
+    def is_no_tasks(self):
+        return self.task == Task.NONE
 
 
 # Global vars

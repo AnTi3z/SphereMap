@@ -15,6 +15,7 @@ logger.setLevel(logging.INFO)
 # Global vars
 nx_map = nx.Graph()
 dst_room = None
+instant_return = False
 
 MODULE_CFG = {}
 
@@ -53,24 +54,38 @@ def generate_dst(src):
             return dst
 
 
+_ready_re = r"(?s)^🧙🏻‍♂️.+❤️\d+ \((\d+)%\) 🛡\d+.+👊"
 _heal_re = r"Твоё ❤️ здоровье и 🛡 щит полностью восстановились!"
 _town_re = r"(?s)^Ты находишься на 🏡(.+?) (\d+)\s+(.+)"
 
 
-# Возвращалка в город
-@events.register(events.NewMessage(chats=(BOT_ID,), pattern=_heal_re))
-async def auto_return(event):
-    if MODULE_CFG['auto_return']:
+@events.register(events.MessageEdited(chats=(BOT_ID,), pattern=_ready_re))
+@events.register(events.NewMessage(chats=(BOT_ID,), pattern=_ready_re))
+async def ready_handler(event):
+    health = int(event.pattern_match.group(1))
+    if instant_return and health == 100 and global_state.is_no_tasks():
         time.sleep(random.uniform(1.1, 2.5))
         await event.respond("🔮 Сфериум")
         time.sleep(random.uniform(1.1, 2.5))
         await event.respond("🏡 Прогулка по городу")
 
 
+# Возвращалка в город
+@events.register(events.NewMessage(chats=(BOT_ID,), pattern=_heal_re))
+async def auto_return(event):
+    global instant_return
+    if instant_return or MODULE_CFG['auto_return']:
+        instant_return = True
+        time.sleep(random.uniform(1.1, 2.5))
+        await event.respond("🏘 Бараки")
+
+
 @events.register(events.MessageEdited(chats=(BOT_ID,), pattern=_town_re))
 @events.register(events.NewMessage(chats=(BOT_ID,), pattern=_town_re))
 async def town_handler(event):
     global dst_room
+    global instant_return
+    instant_return = False
     clicker = ButtonClicker.get_clicker(BOT_ID)
 
     # Если включена тренировка, и мы у тренера - жмём её
@@ -86,11 +101,12 @@ async def town_handler(event):
         return
 
     # Если нет других заданий - включаем автогуляние
-    if not global_state.have_task():
+    if global_state.is_no_tasks():
         global_state.task = Task.WALKING
 
     # Если текущее задание не гулять - возвращаемся в бараки
     if global_state.task != Task.WALKING:
+        instant_return = True
         await clicker.click_cb_data(event, 'cwgoto_-1_-1')
         return
 
@@ -134,4 +150,4 @@ def deactivate():
     logger.info("Sphere.Walker script deactivated")
 
 
-HANDLERS = (town_handler, auto_return)
+HANDLERS = (ready_handler, town_handler, auto_return)
