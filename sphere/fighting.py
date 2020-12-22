@@ -33,8 +33,15 @@ def button_choose(buttons):
 @events.register(events.MessageEdited(chats=(BOT_ID,), pattern=_fight_re))
 @events.register(events.NewMessage(chats=(BOT_ID,), pattern=_fight_re))
 async def fighting(event):
+    if event.buttons is None:
+        return
+
     time.sleep(random.uniform(3.0, 7.5))
-    await button_choose(event.buttons[1:]).click()
+    if "В бой" in event.buttons[0][0].text:
+        logger.debug(f"In to the battle clicked!")
+        await event.click()
+    else:
+        await button_choose(event.buttons[1:]).click()
 
 
 def activate():
