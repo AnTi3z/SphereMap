@@ -8,7 +8,7 @@ from re import search
 from .sphere import BOT_ID
 
 logger = logging.getLogger('Sphere.fighting')
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 MODULE_CFG = {}
 
