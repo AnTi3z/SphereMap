@@ -54,7 +54,7 @@ def generate_dst(src):
             return dst
 
 
-_ready_re = r"(?s)^🧙🏻‍♂️.+❤️\d+ \((\d+)%\) 🛡\d+.+👊"
+_ready_re = r"(?s)^🧙🏻‍♂️.+❤️\d+ \(100%\) 🛡\d+ 👊"
 _heal_re = r"Твоё ❤️ здоровье и 🛡 щит полностью восстановились!"
 _town_re = r"(?s)^Ты находишься на 🏡(.+?) (\d+)\s+(.+)"
 
@@ -62,7 +62,9 @@ _town_re = r"(?s)^Ты находишься на 🏡(.+?) (\d+)\s+(.+)"
 @events.register(events.MessageEdited(chats=(BOT_ID,), pattern=_ready_re))
 @events.register(events.NewMessage(chats=(BOT_ID,), pattern=_ready_re))
 async def ready_handler(event):
-    if instant_return and event.pattern_match.group(1) == '100' and global_state.is_no_tasks():
+    if global_state.task == Task.WALKING:
+        global_state.task = Task.NONE
+    if instant_return and global_state.is_no_tasks():
         time.sleep(random.uniform(1.1, 2.5))
         await event.respond("🔮 Сфериум")
         time.sleep(random.uniform(1.1, 2.5))
@@ -73,8 +75,9 @@ async def ready_handler(event):
 @events.register(events.NewMessage(chats=(BOT_ID,), pattern=_heal_re))
 async def auto_return(event):
     global instant_return
-    if instant_return or MODULE_CFG['auto_return']:
+    if MODULE_CFG['auto_return']:
         instant_return = True
+    if instant_return:
         time.sleep(random.uniform(1.1, 2.5))
         await event.respond("🏘 Бараки")
 
