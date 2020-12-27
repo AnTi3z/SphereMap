@@ -1,4 +1,3 @@
-import asyncio
 import logging
 import random
 import time
@@ -14,6 +13,7 @@ logger.setLevel(logging.INFO)
 MODULE_CFG = {}
 
 steal_timer = Timer(lambda: setattr(global_state, 'task', Task.STEALING), "StealTimer")
+steal_fighting = False
 
 _ready_re = r"(?s)^🧙🏻‍♂️.+❤️\d+.+🛡\d+.+👊"
 _steal_re = r"(?s)^(?:Не найдя ничего лучше)|(?:Поискав подходящий случай)|(?:Побродив в округе)"
@@ -90,6 +90,8 @@ async def steal3_handler(event):
 
 @events.register(events.NewMessage(chats=(BOT_ID,), pattern=_steal_fight_re))
 async def steal4_handler(event):
+    global steal_fighting
+    steal_fighting = True
     logger.info(f"Steal with fight!")
 
 
@@ -107,6 +109,16 @@ async def steal6_handler(event):
     await event.respond("🏘 Бараки")
 
 
+@events.register(events.MessageEdited(chats=(BOT_ID,), pattern="(?s)Показать лог боя:"))
+@events.register(events.NewMessage(chats=(BOT_ID,), pattern="(?s)Показать лог боя:"))
+async def fight_end(event):
+    global steal_fighting
+    if steal_fighting:
+        steal_fighting = False
+        time.sleep(random.uniform(1.1, 2.5))
+        await event.respond("🏘 Бараки")
+
+
 def activate():
     logger.info("Sphere.Stealer script activated")
 
@@ -117,4 +129,5 @@ def deactivate():
 
 HANDLERS = (ready_handler, steal_handler, wait_handler,
             steal1_handler, steal2_handler, steal3_handler,
-            steal4_handler, steal5_handler, steal6_handler)
+            steal4_handler, steal5_handler, steal6_handler,
+            fight_end)
