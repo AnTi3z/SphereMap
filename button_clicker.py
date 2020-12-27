@@ -82,6 +82,8 @@ class ButtonClicker:
             if result is not None:
                 # self._last_button = None
                 logger.debug(f"Button {btn_data} click success")
+            else:
+                logger.warning(f"Button {btn_data} clicked with no result")
         except errors.BotResponseTimeoutError:
             logger.warning(f"Button {btn_data} answer timeout")
         except errors.MessageIdInvalidError:
