@@ -3,7 +3,6 @@ import random
 import time
 
 from telethon import events
-from re import search
 
 from .sphere import BOT_ID
 
@@ -15,7 +14,7 @@ MODULE_CFG = {}
 _fight_re = r'🧙🏻‍♂️.+\n❤️\d+.+🛡\d+.*\n\n.+\n❤️\d+.+🛡\d+'
 
 
-def button_choose(buttons):
+def sphere_choose(buttons):
     buttons_flat = [x for row in buttons for x in row if "🕐" not in x.text]
     if len(buttons_flat) == 1:
         return buttons_flat[0]
@@ -37,11 +36,12 @@ async def fighting(event):
         return
 
     time.sleep(random.uniform(3.0, 7.5))
-    if "В бой" in event.buttons[0][0].text:
+    single_button = event.buttons[0][0]
+    if "В бой" in single_button.text:
         logger.debug(f"In to the battle clicked!")
-        await event.click()
+        await single_button.click()
     else:
-        await button_choose(event.buttons[1:]).click()
+        await sphere_choose(event.buttons[1:]).click()
 
 
 def activate():
