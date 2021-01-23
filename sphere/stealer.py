@@ -109,8 +109,8 @@ async def steal6_handler(event):
     await event.respond("🏘 Бараки")
 
 
-@events.register(events.MessageEdited(chats=(BOT_ID,), pattern="(?s)Показать лог боя:"))
-@events.register(events.NewMessage(chats=(BOT_ID,), pattern="(?s)Показать лог боя:"))
+@events.register(events.MessageEdited(chats=(BOT_ID,), pattern="(?s).+Показать лог боя:"))
+@events.register(events.NewMessage(chats=(BOT_ID,), pattern="(?s).+Показать лог боя:"))
 async def fight_end(event):
     global steal_fighting
     if steal_fighting:
