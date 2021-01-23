@@ -1,0 +1,10 @@
+decorator==4.4.2
+networkx==2.4
+peewee==3.13.3
+# Pillow==7.2.0
+pyaes==1.6.1
+pyasn1==0.4.8
+PyMySQL==0.9.3
+rsa==4.6
+sqlite3==0.0.0
+Telethon==1.15.0
