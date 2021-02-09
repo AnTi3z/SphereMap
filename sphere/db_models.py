@@ -19,9 +19,10 @@ warnings.filterwarnings(
 
 # TODO: Get credentials from loaded modules config
 _cfg = config.load_config("mysql", "sphere/config.json")
-database = MySQLDatabase('sphere_map',
+mysql_db = MySQLDatabase('sphere_map',
                          user=_cfg['user'], password=_cfg['pass'],
                          host='anti3z.ru', port=3306)
+sqlite_db = SqliteDatabase('sphere/sphere.sqlite')
 
 
 class UnknownField(object):
@@ -30,7 +31,7 @@ class UnknownField(object):
 
 class BaseModel(Model):
     class Meta:
-        database = database
+        database = sqlite_db
 
 
 class EventTypes(BaseModel):

@@ -37,7 +37,7 @@ def load_graph(graph, w1=1.0, w2=1.0):
             graph.add_edge(start_room, end_room, weight=w2)
         else:
             graph.add_edge(start_room, end_room, weight=w1)
-    database.close()
+    # sqlite_db.close()
 
 
 def generate_dst(src):
@@ -114,7 +114,7 @@ async def town_handler(event):
 
     # Координаты текущей комнаты
     x = Streets.get_or_none(Streets.name == event.pattern_match.group(1)).x
-    database.close()
+    # sqlite_db.close()
     y = int(event.pattern_match.group(2))
     cur_room = (x, y)
 
